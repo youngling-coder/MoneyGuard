@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .transaction import Transaction
 
+
 class AccountType(builtinEnum):
     SAVING = "saving"
     CREDIT = "credit"
@@ -22,8 +23,12 @@ class Account(UserRelationMixin, Base):
     title: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     balance: Mapped[int] = mapped_column(BigInteger, nullable=False, server_default=0)
     primary_card_number: Mapped[str] = mapped_column(String, nullable=False)
-    account_type: Mapped[str] = mapped_column(Enum(AccountType), nullable=False, server_default=AccountType.WALLET.value)
-    transactions: Mapped[list["Transaction"]] = mapped_column("Transaction", back_populates="owner")
+    account_type: Mapped[str] = mapped_column(
+        Enum(AccountType), nullable=False, server_default=AccountType.WALLET.value
+    )
+    transactions: Mapped[list["Transaction"]] = mapped_column(
+        "Transaction", back_populates="owner"
+    )
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (id={self.id}, balance="{self.balance}", title="{self.title}")'
