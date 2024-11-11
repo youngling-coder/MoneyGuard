@@ -1,4 +1,4 @@
-from .base import Base
+from ..database import Base
 from sqlalchemy import String, text
 from sqlalchemy.orm import Mapped, mapped_column
 from typing import TYPE_CHECKING

@@ -1,7 +1,7 @@
 from sqlalchemy import BigInteger, String, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 from ..custom_types import TransactionType
-from .base import Base
+from ..database import Base
 from .mixins import AccountRelationMixin
 
 
