@@ -4,11 +4,8 @@ from .base import Base
 from .mixins import UserRelationMixin
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from .transaction import Transaction
-
-
 
 
 class Account(UserRelationMixin, Base):
