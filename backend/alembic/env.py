@@ -14,7 +14,10 @@ from app.settings import application_settings
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", f"postgresql+asyncpg://{application_settings.db_user}:{application_settings.db_password}@{application_settings.db_host}:{application_settings.db_port}/{application_settings.db_name}")
+config.set_main_option(
+    "sqlalchemy.url",
+    f"postgresql+asyncpg://{application_settings.db_user}:{application_settings.db_password}@{application_settings.db_host}:{application_settings.db_port}/{application_settings.db_name}",
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -63,6 +66,7 @@ def do_run_migrations(connection: Connection) -> None:
     with context.begin_transaction():
         context.run_migrations()
 
+
 async def run_async_migrations() -> None:
 
     connectable = async_engine_from_config(
@@ -73,8 +77,9 @@ async def run_async_migrations() -> None:
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
-        
+
     await connectable.dispose()
+
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.

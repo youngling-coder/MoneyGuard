@@ -1,9 +1,4 @@
-__all__ = (
-    "base",
-    "User",
-    "Transaction",
-    "Account"
-)
+__all__ = ("base", "User", "Transaction", "Account")
 
 from .base import base
 from .user import User

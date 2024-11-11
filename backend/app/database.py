@@ -5,7 +5,6 @@ from .settings import application_settings
 DATABASE_URL = f"postgresql+asyncpg://{application_settings.db_user}:{application_settings.db_password}@{application_settings.db_host}:{application_settings.db_port}/{application_settings.db_name}"
 
 
-
 # TODO: SET ECHO VALUE TO FALSE BEFORE PRODUCTION!!!
 
 engine = create_async_engine(DATABASE_URL, echo=True)

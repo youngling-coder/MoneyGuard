@@ -9,7 +9,9 @@ class Trasaction(AccountRelationMixin, Base):
 
     _account_back_populates = "transactions"
 
-    amount: Mapped[int] = mapped_column(BigInteger, nullable=False, server_default=text("0"))
+    amount: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default=text("0")
+    )
     description: Mapped[str] = mapped_column(String, nullable=True)
     type: Mapped[str] = mapped_column(Enum(TransactionType), nullable=False)
     recipient: Mapped[str] = mapped_column(String, nullable=True)

@@ -13,6 +13,6 @@ class ApplicationSettings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        
+
 
 application_settings = ApplicationSettings()

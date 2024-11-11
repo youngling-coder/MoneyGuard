@@ -13,7 +13,9 @@ class Account(UserRelationMixin, Base):
     _user_back_populates = "accounts"
 
     title: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    balance: Mapped[int] = mapped_column(BigInteger, nullable=False, server_default=text("0"))
+    balance: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default=text("0")
+    )
     primary_card_number: Mapped[str] = mapped_column(String, nullable=False)
 
     transactions: Mapped[list["Transaction"]] = relationship(back_populates="owner")

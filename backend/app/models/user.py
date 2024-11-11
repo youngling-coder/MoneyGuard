@@ -18,7 +18,9 @@ class User(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     surname: Mapped[str] = mapped_column(String, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
-    logo_path: Mapped[str] = mapped_column(String, nullable=False, server_default="/logos/default.png")
+    logo_path: Mapped[str] = mapped_column(
+        String, nullable=False, server_default="/logos/default.png"
+    )
     accounts: Mapped[list["Account"]] = relationship(back_populates="owner")
 
     def __repr__(self) -> str:
