@@ -1,6 +1,6 @@
-from ..database import Base
+from .base import Base
 from sqlalchemy import String, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING
 
 
@@ -18,10 +18,8 @@ class User(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     surname: Mapped[str] = mapped_column(String, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
-    logo_path: Mapped[str] = mapped_column(
-        String, nullable=False, server_default=text("/logos/default.png")
-    )
-    accounts: Mapped[list["Account"]] = mapped_column("Account", back_populates="owner")
+    logo_path: Mapped[str] = mapped_column(String, nullable=False, server_default="/logos/default.png")
+    accounts: Mapped[list["Account"]] = relationship(back_populates="owner")
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (id={self.id}, full_name="{self.full_name}")'
