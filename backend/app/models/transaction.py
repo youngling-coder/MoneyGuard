@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, String, Enum
+from sqlalchemy import BigInteger, String, Enum, text
 from sqlalchemy.orm import Mapped, mapped_column
 from ..custom_types import TransactionType
 from .base import Base
@@ -9,7 +9,9 @@ class Trasaction(AccountRelationMixin, Base):
 
     _account_back_populates = "transactions"
 
-    amount: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    amount: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, server_default=text("0")
+    )
     description: Mapped[str] = mapped_column(String, nullable=True)
     type: Mapped[str] = mapped_column(Enum(TransactionType), nullable=False)
     recipient: Mapped[str] = mapped_column(String, nullable=True)
