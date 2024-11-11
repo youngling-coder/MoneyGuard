@@ -15,7 +15,8 @@ class User(Base):
     # of all the accounts it will be calculated and returned to the client
 
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    full_name: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    surname: Mapped[str] = mapped_column(String, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
     logo_path: Mapped[str] = mapped_column(
         String, nullable=False, server_default=text("/logos/default.png")
