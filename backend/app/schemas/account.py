@@ -16,7 +16,7 @@ class AccountResponse(Account):
     balance: int
     primary_account_number: str
     timestamp: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
