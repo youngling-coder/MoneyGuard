@@ -1,8 +1,7 @@
-from sqlalchemy import String, BigInteger, Enum
+from sqlalchemy import String, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 from .mixins import UserRelationMixin
-from ..custom_types import AccountType
 from typing import TYPE_CHECKING
 
 
