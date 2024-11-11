@@ -2,7 +2,7 @@ from sqlalchemy import String, BigInteger, Enum
 from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 from .mixins import UserRelationMixin
-from enum import Enum as builtinEnum
+from ..custom_types import AccountType
 from typing import TYPE_CHECKING
 
 
@@ -10,10 +10,6 @@ if TYPE_CHECKING:
     from .transaction import Transaction
 
 
-class AccountType(builtinEnum):
-    SAVING = "saving"
-    CREDIT = "credit"
-    WALLET = "wallet"
 
 
 class Account(UserRelationMixin, Base):
