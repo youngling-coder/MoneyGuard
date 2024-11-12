@@ -1,6 +1,5 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from custom_types import AccountType
 
 
 class Account(BaseModel):
@@ -9,7 +8,6 @@ class Account(BaseModel):
 
 class CreateAccount(Account):
     primary_card_number: str
-    account_type: AccountType
 
 
 class AccountResponse(Account):
