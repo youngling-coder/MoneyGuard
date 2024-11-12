@@ -5,7 +5,7 @@ from .base import Base
 from .mixins import AccountRelationMixin
 
 
-class Trasaction(AccountRelationMixin, Base):
+class Transaction(AccountRelationMixin, Base):
 
     _account_back_populates = "transactions"
 

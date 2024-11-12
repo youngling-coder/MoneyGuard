@@ -21,7 +21,7 @@ class User(Base):
     logo_path: Mapped[str] = mapped_column(
         String, nullable=False, server_default="/logos/default.png"
     )
-    accounts: Mapped[list["Account"]] = relationship(back_populates="owner")
+    accounts: Mapped[list["Account"]] = relationship("Account", back_populates="owner")
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (id={self.id}, full_name="{self.full_name}")'

@@ -60,7 +60,7 @@ def upgrade() -> None:
         sa.UniqueConstraint("title"),
     )
     op.create_table(
-        "trasactions",
+        "transactions",
         sa.Column(
             "amount", sa.BigInteger(), server_default=sa.text("0"), nullable=False
         ),
