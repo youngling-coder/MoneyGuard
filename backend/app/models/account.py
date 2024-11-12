@@ -18,7 +18,9 @@ class Account(UserRelationMixin, Base):
     )
     primary_card_number: Mapped[str] = mapped_column(String, nullable=False)
 
-    transactions: Mapped[list["Transaction"]] = relationship("Transaction", back_populates="owner")
+    transactions: Mapped[list["Transaction"]] = relationship(
+        "Transaction", back_populates="owner"
+    )
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (id={self.id}, balance="{self.balance}", title="{self.title}")'

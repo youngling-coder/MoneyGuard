@@ -12,7 +12,9 @@ class Base(DeclarativeBase):
 
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     timestamp: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), server_default=func.now(), nullable=False
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+        server_default=func.now(),
+        nullable=False,
     )
 
 

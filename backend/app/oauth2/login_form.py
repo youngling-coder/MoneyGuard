@@ -1,6 +1,7 @@
 from typing import Annotated, Union
 from fastapi import Form
 
+
 class OAuth2EmailRequestForm:
     def __init__(
         self,

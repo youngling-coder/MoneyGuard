@@ -10,5 +10,3 @@ def get_password_hash(password: str) -> str:
 
 def verify_password(plain: str, hash: str) -> bool:
     return password_context.verify(plain, hash)
-
-
