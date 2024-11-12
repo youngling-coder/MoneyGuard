@@ -3,7 +3,8 @@ from datetime import datetime
 
 
 class User(BaseModel):
-    full_name: str
+    name: str
+    surname: str
 
 
 class CreateUser(User):
