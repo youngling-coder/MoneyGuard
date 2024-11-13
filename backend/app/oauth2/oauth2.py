@@ -68,4 +68,10 @@ async def get_current_user(
     stmt = select(models.User).filter(models.User.id == token_data.id)
     result = await db.execute(stmt)
     user = result.scalars().first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found!"
+        )
     return user
