@@ -11,7 +11,7 @@ from .. import models, utils
 router = APIRouter(tags=["Authentication"])
 
 
-@router.post("/login", status_code=status.HTTP_201_CREATED)
+@router.post("/login")
 async def login(
     user_credentials: OAuth2EmailRequestForm = Depends(),
     db: AsyncSession = Depends(get_db),
