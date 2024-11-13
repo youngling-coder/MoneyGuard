@@ -19,5 +19,6 @@ class UserResponse(User):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UpdateUser(CreateUser):
-    pass
+class UpdateUser(User):
+    email: EmailStr
+
