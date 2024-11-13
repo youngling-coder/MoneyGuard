@@ -22,6 +22,7 @@ class UserResponse(User):
 class UpdateUser(User):
     email: EmailStr
 
+
 class UpdatePassword(BaseModel):
     old_password: str
     new_password: str
