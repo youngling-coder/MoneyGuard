@@ -39,14 +39,14 @@ def verify_access_token(
             application_settings.jwt_secret_key,
             algorithms=[application_settings.jwt_algo],
         )
-        id: str = payload.get("id")
+        id: int = payload.get("id")
 
         if id is None:
             raise credentials_exception
 
         token_data = TokenData(id=id)
 
-    except JWTError as jwt_err:
+    except JWTError:
         raise credentials_exception
 
     return token_data
@@ -61,12 +61,11 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    token: Optional[TokenData] = verify_access_token(
+    token_data: Optional[TokenData] = verify_access_token(
         token=token, credentials_exception=credentials_exception
     )
 
-    stmt = select(models.User).filter(models.User.id == token.id)
+    stmt = select(models.User).filter(models.User.id == token_data.id)
     result = await db.execute(stmt)
     user = result.scalars().first()
-
     return user
