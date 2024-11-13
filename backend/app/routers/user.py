@@ -72,3 +72,23 @@ async def delete_user(db: AsyncSession = Depends(get_db), current_user = Depends
     await db.execute(stmt)
     await db.commit()
     
+
+@router.patch("/password", status_code=status.HTTP_204_NO_CONTENT)
+async def update_passowrd(password_form: schemas.UpdatePassword, db: AsyncSession = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+    
+    stmt_user = select(models.User).filter(models.User.id == current_user.id)
+    result_user = await db.execute(stmt_user)
+    user = result_user.scalars().first()
+
+    if not utils.verify_password(password_form.old_password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Old password is wrong!"
+        )
+        
+    new_password = utils.get_password_hash(password_form.new_password)
+
+    stmt = update(models.User).where(models.User.id == current_user.id).values(password=new_password)
+
+    await db.execute(stmt)
+    await db.commit()
