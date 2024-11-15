@@ -18,8 +18,8 @@ class User(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     surname: Mapped[str] = mapped_column(String, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
-    logo_path: Mapped[str] = mapped_column(
-        String, nullable=False, server_default="/logos/default.png"
+    profile_picture: Mapped[str] = mapped_column(
+        String, nullable=True
     )
     accounts: Mapped[list["Account"]] = relationship("Account", back_populates="owner")
 

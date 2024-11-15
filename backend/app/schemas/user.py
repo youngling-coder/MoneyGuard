@@ -15,6 +15,7 @@ class CreateUser(User):
 class UserResponse(User):
     id: int
     email: str
+    profile_picture: str
     timestamp: datetime
     model_config = ConfigDict(from_attributes=True)
 
