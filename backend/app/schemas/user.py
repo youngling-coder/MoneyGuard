@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 from datetime import datetime
-
+from typing import Optional
 
 class User(BaseModel):
     name: str
@@ -15,7 +15,7 @@ class CreateUser(User):
 class UserResponse(User):
     id: int
     email: str
-    profile_picture: str
+    profile_picture: Optional[str]
     timestamp: datetime
     model_config = ConfigDict(from_attributes=True)
 
