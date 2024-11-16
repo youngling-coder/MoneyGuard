@@ -1,5 +1,6 @@
 from typing import Annotated, Union
 from fastapi import Form
+from pydantic import EmailStr
 
 
 class OAuth2EmailRequestForm:
@@ -11,7 +12,7 @@ class OAuth2EmailRequestForm:
             Form(pattern="password"),
         ] = None,
         email: Annotated[
-            str,
+            EmailStr,
             Form(),
         ],
         password: Annotated[
