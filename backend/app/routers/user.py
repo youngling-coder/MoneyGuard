@@ -137,7 +137,7 @@ async def update_profile_picture(
     
     image_bytes = await profile_picture.read()
     image = Image.open(BytesIO(image_bytes))
-    save_path = f".{utils.get_profile_picture_url(current_user.id)}"
+    save_path = utils.get_profile_picture_url(current_user.id)
 
     stmt = select(models.User).filter(models.User.id == current_user.id)
     result = await db.execute(stmt)
@@ -150,7 +150,7 @@ async def update_profile_picture(
         await db.commit()
         await db.refresh(user)
 
-    except:
+    except Exception as ex:
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
@@ -164,7 +164,7 @@ async def delete_profile_picture(
     current_user=Depends(oauth2.get_current_user),
 ):
     
-    save_path = f".{utils.get_profile_picture_url(current_user.id)}"
+    save_path = utils.get_profile_picture_url(current_user.id)
 
     try:
         os.remove(save_path)
