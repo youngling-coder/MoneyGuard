@@ -133,6 +133,12 @@ async def update_profile_picture(
         )
 
     image_bytes = await profile_picture.read()
+
+    if len(image_bytes) > 2 ** 20:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Image is too large! Maximal file size is {((2 ** 20) / (10 ** 6)):.2f}MB "
+        )
     image = Image.open(BytesIO(image_bytes))
     save_path = utils.get_profile_picture_url(current_user.id)
 
@@ -148,6 +154,7 @@ async def update_profile_picture(
         await db.refresh(user)
 
     except Exception as ex:
+        print(ex, save_path)
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
