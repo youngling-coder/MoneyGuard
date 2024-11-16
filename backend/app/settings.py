@@ -13,7 +13,7 @@ class ApplicationSettings(BaseSettings):
     profile_picture_filename: str
     profile_picture_extension: str
     profile_picture_path: str
-    
+
     class Config:
         env_file = ".env"
 

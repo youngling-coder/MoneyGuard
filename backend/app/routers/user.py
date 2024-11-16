@@ -123,18 +123,15 @@ async def update_profile_picture(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(oauth2.get_current_user),
 ):
-    
-    SUPPORTED_FILE_TYPES = (
-        "image/png",
-        "image/jpeg"
-    )
+
+    SUPPORTED_FILE_TYPES = ("image/png", "image/jpeg")
 
     if profile_picture.content_type not in SUPPORTED_FILE_TYPES:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Unsupported file type. Allowed types: image/jpeg, image/png"
+            detail=f"Unsupported file type. Allowed types: image/jpeg, image/png",
         )
-    
+
     image_bytes = await profile_picture.read()
     image = Image.open(BytesIO(image_bytes))
     save_path = utils.get_profile_picture_url(current_user.id)
@@ -153,17 +150,17 @@ async def update_profile_picture(
     except Exception as ex:
 
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-            detail="Something went wrong while image processing"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong while image processing",
         )
-    
+
 
 @router.delete("/profile_picture")
 async def delete_profile_picture(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(oauth2.get_current_user),
 ):
-    
+
     save_path = utils.get_profile_picture_url(current_user.id)
 
     try:
