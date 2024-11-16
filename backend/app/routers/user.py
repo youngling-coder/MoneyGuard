@@ -1,6 +1,8 @@
-from typing import Optional
+from io import BytesIO
+import os
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from PIL import Image
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import update, delete
@@ -8,7 +10,7 @@ from sqlalchemy import update, delete
 from ..database import get_db
 from .. import models, schemas, utils
 from ..oauth2 import oauth2
-
+from ..settings import application_settings
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -113,3 +115,44 @@ async def update_passowrd(
 
     await db.execute(stmt)
     await db.commit()
+
+
+@router.patch("/profile_picture")
+async def update_profile_picture(
+    profile_picture: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(oauth2.get_current_user),
+):
+    
+    SUPPORTED_FILE_TYPES = (
+        "image/png",
+        "image/jpeg"
+    )
+
+    if profile_picture.content_type not in SUPPORTED_FILE_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Unsupported file type. Allowed types: image/jpeg, image/png"
+        )
+    
+    image_bytes = await profile_picture.read()
+    image = Image.open(BytesIO(image_bytes))
+    save_path = f".{utils.get_profile_picture_url(current_user.id)}"
+
+    stmt = select(models.User).filter(models.User.id == current_user.id)
+    result = await db.execute(stmt)
+    user = result.scalars().first()
+
+    try:
+        image.save(save_path)
+
+        user.profile_picture = save_path
+        await db.commit()
+        await db.refresh(user)
+
+    except:
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail="Something went wrong while image processing"
+        )
