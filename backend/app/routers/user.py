@@ -10,7 +10,7 @@ from sqlalchemy import update, delete
 from ..database import get_db
 from .. import models, schemas, utils
 from ..oauth2 import oauth2
-from ..settings import application_settings
+
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -156,3 +156,25 @@ async def update_profile_picture(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
             detail="Something went wrong while image processing"
         )
+    
+
+@router.delete("/profile_picture")
+async def delete_profile_picture(
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(oauth2.get_current_user),
+):
+    
+    save_path = f".{utils.get_profile_picture_url(current_user.id)}"
+
+    try:
+        os.remove(save_path)
+
+    finally:
+        stmt = select(models.User).filter(models.User.id == current_user.id)
+        result = await db.execute(stmt)
+        user = result.scalars().first()
+
+        user.profile_picture = None
+
+        await db.commit()
+        await db.refresh(user)
