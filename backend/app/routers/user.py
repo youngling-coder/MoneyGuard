@@ -84,8 +84,14 @@ async def delete_user(
     db: AsyncSession = Depends(get_db), current_user=Depends(oauth2.get_current_user)
 ):
 
-    stmt = delete(models.User).where(models.User.id == current_user.id)
-    await db.execute(stmt)
+    stmt = delete(models.User).where(models.User.id == current_user.id).returning(models.User)
+    
+    result = await db.execute(stmt)
+    user = result.scalars().first()
+
+    if user.profile_picture:
+        os.remove(user.profile_picture)
+    
     await db.commit()
 
 
@@ -139,6 +145,7 @@ async def update_profile_picture(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Image is too large! Maximal file size is {((2 ** 20) / (10 ** 6)):.2f}MB "
         )
+    
     image = Image.open(BytesIO(image_bytes))
     save_path = utils.get_profile_picture_url(current_user.id)
 
