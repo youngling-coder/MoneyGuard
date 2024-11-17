@@ -1,5 +1,5 @@
 class EmailTemplates:
-    EMAIL_VERIFICATION = f"""\
+    EMAIL_VERIFICATION_TEMPLATE = f"""\
 Hello and welcome to MoneyGuard!
 
 We are glad to inform you that you've successfully signed up!
