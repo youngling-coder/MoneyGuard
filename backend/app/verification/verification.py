@@ -9,9 +9,7 @@ from ..settings import application_settings
 
 
 def generate_confirmation_token(email: EmailStr):
-    to_encode = {
-        "email": email
-    }
+    to_encode = {"email": email}
 
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=application_settings.email_confirmation_url_expiration_time
@@ -22,21 +20,23 @@ def generate_confirmation_token(email: EmailStr):
     return jwt.encode(
         to_encode,
         application_settings.jwt_secret_key,
-        algorithm=application_settings.jwt_algo
+        algorithm=application_settings.jwt_algo,
     )
 
 
-def verify_confirmation_token(token: str, credentials_exception: HTTPException) -> EmailStr:
+def verify_confirmation_token(
+    token: str, credentials_exception: HTTPException
+) -> EmailStr:
     try:
         payload = jwt.decode(
             token,
             application_settings.jwt_secret_key,
-            algorithms=[application_settings.jwt_algo]
+            algorithms=[application_settings.jwt_algo],
         )
 
         email: EmailStr = payload.get("email")
 
     except:
         raise credentials_exception
-    
+
     return email

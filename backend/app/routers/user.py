@@ -17,22 +17,33 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.get("/verify/{token}", status_code=status.HTTP_204_NO_CONTENT)
-async def verify_email(token: Annotated[str, Path()], db: AsyncSession = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
-    
+async def verify_email(
+    token: Annotated[str, Path()],
+    db: AsyncSession = Depends(get_db),
+    current_user: models.User = Depends(oauth2.get_current_user),
+):
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="User is not authenticated to confirm an email"
+        detail="User is not authenticated to confirm an email",
     )
-    email_to_verify = verification.verify_confirmation_token(token=token, credentials_exception=credentials_exception)
+    email_to_verify = verification.verify_confirmation_token(
+        token=token, credentials_exception=credentials_exception
+    )
 
     if email_to_verify != current_user.email:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Current user email and confirmation email don't match!"
+            detail="Current user email and confirmation email don't match!",
         )
-    
-    stmt = update(models.User).where(models.User.id == current_user.id).values(email_confirmed=True)
-    
+
+    stmt = (
+        update(models.User)
+        .where(models.User.id == current_user.id)
+        .execution_options(synchronize_session="fetch")
+        .values(email_confirmed=True)
+    )
+
     await db.execute(stmt)
     await db.commit()
 
@@ -62,12 +73,12 @@ async def signup(user: schemas.CreateUser, db: AsyncSession = Depends(get_db)):
     email_confirmation_url = f"{router.prefix}/verify/{verification_token}"
     email_template = smtp.EmailTemplates.EMAIL_VERIFICATION_TEMPLATE
 
-    email_template = email_template.replace("email_confirmation_url", email_confirmation_url)
+    email_template = email_template.replace(
+        "email_confirmation_url", email_confirmation_url
+    )
 
     smtp.send_email(
-        to=new_user.email,
-        subject="Email Confirmation",
-        content=email_template
+        to=new_user.email, subject="Email Confirmation", content=email_template
     )
 
 
@@ -96,16 +107,18 @@ async def update_user(
     updated_user_stmt = await db.execute(stmt)
 
     if email_updated:
-        verification_token = verification.generate_confirmation_token(email=updated_user.email)
+        verification_token = verification.generate_confirmation_token(
+            email=updated_user.email
+        )
         email_confirmation_url = f"{router.prefix}/verify/{verification_token}"
         email_template = smtp.EmailTemplates.EMAIL_VERIFICATION_TEMPLATE
 
-        email_template = email_template.replace("email_confirmation_url", email_confirmation_url)
+        email_template = email_template.replace(
+            "email_confirmation_url", email_confirmation_url
+        )
 
         smtp.send_email(
-        to=updated_user.email,
-        subject="Email Confirmation",
-        content=email_template
+            to=updated_user.email, subject="Email Confirmation", content=email_template
         )
 
     updated_user = updated_user_stmt.scalars().first()
@@ -117,7 +130,8 @@ async def update_user(
 
 @router.get("/get", response_model=schemas.UserResponse)
 async def get_user(
-    db: AsyncSession = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: models.User = Depends(oauth2.get_current_user),
 ):
 
     stmt = select(models.User).filter(models.User.id == current_user.id)
@@ -129,17 +143,22 @@ async def get_user(
 
 @router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
-    db: AsyncSession = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: models.User = Depends(oauth2.get_current_user),
 ):
 
-    stmt = delete(models.User).where(models.User.id == current_user.id).returning(models.User)
-    
+    stmt = (
+        delete(models.User)
+        .where(models.User.id == current_user.id)
+        .returning(models.User)
+    )
+
     result = await db.execute(stmt)
     user = result.scalars().first()
 
     if user.profile_picture:
         os.remove(user.profile_picture)
-    
+
     await db.commit()
 
 
@@ -164,6 +183,7 @@ async def update_passowrd(
     stmt = (
         update(models.User)
         .where(models.User.id == current_user.id)
+        .execution_options(synchronize_session="fetch")
         .values(password=new_password)
     )
 
@@ -188,12 +208,12 @@ async def update_profile_picture(
 
     image_bytes = await profile_picture.read()
 
-    if len(image_bytes) > 2 ** 20:
+    if len(image_bytes) > 2**20:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Image is too large! Maximal file size is {((2 ** 20) / (10 ** 6)):.2f}MB "
+            detail=f"Image is too large! Maximal file size is {((2 ** 20) / (10 ** 6)):.2f}MB ",
         )
-    
+
     image = Image.open(BytesIO(image_bytes))
     save_path = utils.get_profile_picture_url(current_user.id)
 
