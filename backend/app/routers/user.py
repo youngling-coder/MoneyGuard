@@ -84,6 +84,8 @@ async def update_user(
     target_user_result = await db.execute(target_user_stmt)
     target_user = target_user_result.scalars().first()
 
+    email_updated = target_user.email != updated_user.email
+
     stmt = (
         update(models.User)
         .where(models.User.id == target_user.id)
@@ -91,8 +93,21 @@ async def update_user(
         .execution_options(synchronize_session="fetch")
         .returning(models.User)
     )
-
     updated_user_stmt = await db.execute(stmt)
+
+    if email_updated:
+        verification_token = verification.generate_confirmation_token(email=updated_user.email)
+        email_confirmation_url = f"{router.prefix}/verify/{verification_token}"
+        email_template = smtp.EmailTemplates.EMAIL_VERIFICATION_TEMPLATE
+
+        email_template = email_template.replace("email_confirmation_url", email_confirmation_url)
+
+        smtp.send_email(
+        to=updated_user.email,
+        subject="Email Confirmation",
+        content=email_template
+        )
+
     updated_user = updated_user_stmt.scalars().first()
 
     await db.commit()
