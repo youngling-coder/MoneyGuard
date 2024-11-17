@@ -1,5 +1,5 @@
 from .base import Base
-from sqlalchemy import String, text
+from sqlalchemy import String, Boolean, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING
 
@@ -15,6 +15,9 @@ class User(Base):
     # of all the accounts it will be calculated and returned to the client
 
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    email_confirmed: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false"), default=False
+    )
     name: Mapped[str] = mapped_column(String, nullable=False)
     surname: Mapped[str] = mapped_column(String, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
