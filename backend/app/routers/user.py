@@ -1,18 +1,40 @@
+from typing import Annotated
 from io import BytesIO
 import os
 
 from PIL import Image
-from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import update, delete
 
 from ..database import get_db
-from .. import models, schemas, utils
+from .. import models, schemas, utils, smtp, verification
 from ..oauth2 import oauth2
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
+
+
+@router.get("/verify/{token}", status_code=status.HTTP_204_NO_CONTENT)
+async def verify_email(token: Annotated[str, Path()], db: AsyncSession = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
+    
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="User is not authenticated to confirm an email"
+    )
+    email_to_verify = verification.verify_confirmation_token(token=token, credentials_exception=credentials_exception)
+
+    if email_to_verify != current_user.email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current user email and confirmation email don't match!"
+        )
+    
+    stmt = update(models.User).where(models.User.id == current_user.id).values(email_confirmed=True)
+    
+    await db.execute(stmt)
+    await db.commit()
 
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
@@ -43,7 +65,7 @@ async def signup(user: schemas.CreateUser, db: AsyncSession = Depends(get_db)):
 async def update_user(
     updated_user: schemas.UpdateUser,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(oauth2.get_current_user),
+    current_user: models.User = Depends(oauth2.get_current_user),
 ):
 
     target_user_stmt = select(models.User).filter(models.User.id == current_user.id)
@@ -68,7 +90,7 @@ async def update_user(
 
 @router.get("/get", response_model=schemas.UserResponse)
 async def get_user(
-    db: AsyncSession = Depends(get_db), current_user=Depends(oauth2.get_current_user)
+    db: AsyncSession = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)
 ):
 
     stmt = select(models.User).filter(models.User.id == current_user.id)
@@ -80,7 +102,7 @@ async def get_user(
 
 @router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
-    db: AsyncSession = Depends(get_db), current_user=Depends(oauth2.get_current_user)
+    db: AsyncSession = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)
 ):
 
     stmt = delete(models.User).where(models.User.id == current_user.id).returning(models.User)
@@ -98,7 +120,7 @@ async def delete_user(
 async def update_passowrd(
     password_form: schemas.UpdatePassword,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(oauth2.get_current_user),
+    current_user: models.User = Depends(oauth2.get_current_user),
 ):
 
     stmt_user = select(models.User).filter(models.User.id == current_user.id)
@@ -126,7 +148,7 @@ async def update_passowrd(
 async def update_profile_picture(
     profile_picture: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(oauth2.get_current_user),
+    current_user: models.User = Depends(oauth2.get_current_user),
 ):
 
     SUPPORTED_FILE_TYPES = ("image/png", "image/jpeg")
@@ -170,7 +192,7 @@ async def update_profile_picture(
 @router.delete("/profile_picture")
 async def delete_profile_picture(
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(oauth2.get_current_user),
+    current_user: models.User = Depends(oauth2.get_current_user),
 ):
 
     save_path = utils.get_profile_picture_url(current_user.id)
