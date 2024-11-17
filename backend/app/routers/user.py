@@ -32,7 +32,6 @@ async def signup(user: schemas.CreateUser, db: AsyncSession = Depends(get_db)):
 
     new_user = models.User(**user.model_dump())
     new_user.password = hashed_password
-    print(new_user.timestamp)
 
     db.add(new_user)
     await db.commit()
@@ -161,7 +160,6 @@ async def update_profile_picture(
         await db.refresh(user)
 
     except Exception as ex:
-        print(ex, save_path)
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
