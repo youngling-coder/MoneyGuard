@@ -21,6 +21,8 @@ class ApplicationSettings(BaseSettings):
     smtp_server_login: str
     smtp_server_password: str
 
+    email_confirmation_url_expiration_time: int
+
     class Config:
         env_file = ".env"
 
