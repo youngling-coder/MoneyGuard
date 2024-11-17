@@ -17,7 +17,7 @@ from ..settings import application_settings
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
-def create_access_token(data: dict):
+def create_token(data: dict):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=application_settings.jwt_expiration_time
