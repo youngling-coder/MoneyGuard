@@ -10,17 +10,17 @@ class ApplicationSettings(BaseSettings):
 
     jwt_secret_key: str
     jwt_algo: str = "HS256"
-    jwt_expiration_time: int = 60
+    jwt_expiration_time: int
     
     profile_picture_filename: str
     profile_picture_extension: str
     profile_picture_path: str
 
     smtp_server_host: str
-    smtp_server_port: int
+    smtp_server_port: str
     smtp_server_login: str
     smtp_server_password: str
-    
+
     class Config:
         env_file = ".env"
 
