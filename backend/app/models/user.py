@@ -1,7 +1,8 @@
+from typing import TYPE_CHECKING, Optional
+
 from .base import Base
-from sqlalchemy import String, Boolean, text
+from sqlalchemy import Date, String, Boolean, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -20,8 +21,12 @@ class User(Base):
     )
     name: Mapped[str] = mapped_column(String, nullable=False)
     surname: Mapped[str] = mapped_column(String, nullable=False)
+    profession: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
-    profile_picture: Mapped[str] = mapped_column(String, nullable=True)
+    country: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    city: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    birthdate: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
+    profile_picture: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     accounts: Mapped[list["Account"]] = relationship("Account", back_populates="owner")
 
     def __repr__(self) -> str:
