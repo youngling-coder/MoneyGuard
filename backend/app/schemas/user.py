@@ -6,6 +6,10 @@ from typing import Optional
 class User(BaseModel):
     name: str
     surname: str
+    profession: Optional[str]
+    country: Optional[str]
+    city: Optional[str]
+    birthdate: Optional[datetime.date]
 
 
 class CreateUser(User):
