@@ -14,11 +14,11 @@ class Account(UserRelationMixin, Base):
 
     _user_back_populates = "accounts"
 
-    title: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    title: Mapped[str] = mapped_column(String, nullable=False)
     balance: Mapped[int] = mapped_column(
         BigInteger, nullable=False, server_default=text("0")
     )
-    primary_account_number: Mapped[str] = mapped_column(String, nullable=False)
+    primary_account_number: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     card_verification_value: Mapped[str] = mapped_column(String, nullable=False)
     expiration_date: Mapped[datetime] = mapped_column(Date, nullable=False)
 
