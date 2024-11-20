@@ -9,7 +9,7 @@ class User(BaseModel):
     profession: Optional[str]
     country: Optional[str]
     city: Optional[str]
-    birthdate: Optional[datetime.date]
+    birthdate: Optional[datetime]
 
 
 class CreateUser(User):
