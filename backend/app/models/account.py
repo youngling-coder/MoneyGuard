@@ -1,8 +1,10 @@
-from sqlalchemy import String, BigInteger, text
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import String, BigInteger, text, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .mixins import UserRelationMixin
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .transaction import Transaction
@@ -17,6 +19,8 @@ class Account(UserRelationMixin, Base):
         BigInteger, nullable=False, server_default=text("0")
     )
     primary_card_number: Mapped[str] = mapped_column(String, nullable=False)
+    card_verification_number: Mapped[str] = mapped_column(String, nullable=False)
+    expiration_date: Mapped[datetime] = mapped_column(Date, nullale=False)
 
     transactions: Mapped[list["Transaction"]] = relationship(
         "Transaction", back_populates="owner"
