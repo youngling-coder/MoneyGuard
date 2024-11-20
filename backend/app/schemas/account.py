@@ -13,6 +13,8 @@ class CreateAccount(Account):
 class AccountResponse(Account):
     balance: int
     primary_account_number: str
+    card_verification_number: str
+    expiration_date: datetime
     timestamp: datetime
 
     model_config = ConfigDict(from_attributes=True)
