@@ -14,6 +14,7 @@ class CreateAccount(Account):
 
 
 class AccountResponse(Account):
+    id: int
     balance: int
     timestamp: datetime
 
