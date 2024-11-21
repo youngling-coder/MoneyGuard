@@ -87,25 +87,27 @@ async def signup(user: schemas.CreateUser, db: AsyncSession = Depends(get_db)):
     "/update", status_code=status.HTTP_200_OK, response_model=schemas.UserResponse
 )
 async def update_user(
-    updated_user: schemas.UpdateUser,
+    user: schemas.UpdateUser,
     db: AsyncSession = Depends(get_db),
     current_user: models.User = Depends(oauth2.get_current_user),
 ):
 
-    target_user_stmt = select(models.User).filter(models.User.id == current_user.id)
-    target_user_result = await db.execute(target_user_stmt)
-    target_user = target_user_result.scalars().first()
-
-    email_updated = target_user.email != updated_user.email
-
-    stmt = (
+    updated_user_stmt = (
         update(models.User)
-        .where(models.User.id == target_user.id)
-        .values(updated_user.model_dump())
+        .where(models.User.id == current_user.id)
+        .values(user.model_dump())
         .execution_options(synchronize_session="fetch")
         .returning(models.User)
     )
-    updated_user_stmt = await db.execute(stmt)
+
+    email_updated = current_user.email != user.email
+
+    updated_user_result = await db.execute(updated_user_stmt)
+    await db.commit()
+
+    updated_user = updated_user_result.scalars().first()
+
+    await db.refresh(updated_user, ["accounts"])
 
     if email_updated:
         verification_token = verification.generate_confirmation_token(
@@ -121,10 +123,6 @@ async def update_user(
         smtp.send_email(
             to=updated_user.email, subject="Email Confirmation", content=email_template
         )
-
-    updated_user = updated_user_stmt.scalars().first()
-
-    await db.commit()
 
     return updated_user
 
