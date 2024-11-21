@@ -73,8 +73,10 @@ async def update_account(id: Annotated[int, Path()], account: schemas.UpdateAcco
             detail="No matching account found!"
         )
     
-    stmt = update(models.Account).where(models.Account.id == id).values(**account.model_dump()).execution_options(synchronize_session="fetch").returning(models.Account)
+    stmt = update(models.Account).where(models.Account.id == id).values(account.model_dump()).execution_options(synchronize_session="fetch").returning(models.Account)
     result = await db.execute(stmt)
+    await db.commit()
+
     account = result.scalars().first()
 
     return account
