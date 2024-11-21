@@ -133,7 +133,11 @@ async def get_user(
     current_user: models.User = Depends(oauth2.get_current_user),
 ):
 
-    stmt = select(models.User).filter(models.User.id == current_user.id).options(selectinload(models.User.accounts))
+    stmt = (
+        select(models.User)
+        .filter(models.User.id == current_user.id)
+        .options(selectinload(models.User.accounts))
+    )
     result = await db.execute(stmt)
     requested_user = result.scalars().first()
 

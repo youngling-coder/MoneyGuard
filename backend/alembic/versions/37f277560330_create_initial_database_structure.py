@@ -56,7 +56,7 @@ def upgrade() -> None:
             ["owner_id"],
             ["users.id"],
         ),
-        sa.PrimaryKeyConstraint("id")
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "transactions",

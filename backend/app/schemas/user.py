@@ -9,7 +9,6 @@ class User(BaseModel):
     surname: str
 
 
-
 class CreateUser(User):
     email: EmailStr
     password: str
@@ -21,6 +20,7 @@ class UpdateUser(User):
     country: Optional[str]
     city: Optional[str]
     birthdate: Optional[datetime]
+
 
 class UserResponse(UpdateUser):
     id: int
