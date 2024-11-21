@@ -22,4 +22,4 @@ class AccountResponse(Account):
 
 
 class UpdateAccount(Account):
-    balance: int
+    pass
