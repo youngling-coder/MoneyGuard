@@ -19,7 +19,7 @@ async def add_account(account: schemas.CreateAccount, db: AsyncSession = Depends
     if account_exists:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="This ccount already exists!"
+            detail="This account already exists!"
         )
     
     new_account = models.Account(**account.model_dump())
@@ -27,3 +27,12 @@ async def add_account(account: schemas.CreateAccount, db: AsyncSession = Depends
 
     db.add(new_account)
     await db.commit()
+
+@router.get("/get_all", response_model=list[schemas.AccountResponse])
+async def get_accounts(db: AsyncSession = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
+
+    stmt = select(models.Account).where(models.Account.owner_id == current_user.id)
+    result = await db.execute(stmt)
+    accounts = result.scalars().all()
+
+    return accounts
