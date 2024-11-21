@@ -33,6 +33,6 @@ async def login(
             detail="Invalid password for an account with a given email!",
         )
 
-    access_token = oauth2.create_access_token(data={"id": user.id})
+    access_token = oauth2.create_token(data={"id": user.id})
 
     return {"access_token": access_token, "token_type": "bearer"}

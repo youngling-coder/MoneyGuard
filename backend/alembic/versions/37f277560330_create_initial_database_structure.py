@@ -46,7 +46,7 @@ def upgrade() -> None:
         sa.Column(
             "balance", sa.BigInteger(), server_default=sa.text("0"), nullable=False
         ),
-        sa.Column("primary_card_number", sa.String(), nullable=False),
+        sa.Column("primary_account_number", sa.String(), nullable=False),
         sa.Column("owner_id", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
@@ -56,8 +56,7 @@ def upgrade() -> None:
             ["owner_id"],
             ["users.id"],
         ),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("title"),
+        sa.PrimaryKeyConstraint("id")
     )
     op.create_table(
         "transactions",
