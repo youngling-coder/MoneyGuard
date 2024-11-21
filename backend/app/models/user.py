@@ -30,7 +30,7 @@ class User(Base):
     accounts: Mapped[list["Account"]] = relationship("Account", back_populates="owner")
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__} (id={self.id}, full_name="{self.full_name}")'
+        return f'{self.__class__.__name__} (id={self.id}, name="{self.name}")'
 
     def __str__(self) -> str:
-        return f'{self.__class__.__name__} (id={self.id}, full_name="{self.full_name}")'
+        return f'{self.__class__.__name__} (id={self.id}, name="{self.name}")'
