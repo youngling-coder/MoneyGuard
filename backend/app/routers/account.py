@@ -2,7 +2,7 @@ from typing import Annotated
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import delete
+from sqlalchemy import delete, update
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 
 from .. import models, schemas
@@ -58,3 +58,23 @@ async def delete_account(id: Annotated[int, Path()], db: AsyncSession = Depends(
     stmt = delete(models.Account).where(models.Account.id == id)
     await db.execute(stmt)
     await db.commit()
+
+
+@router.put("/update/{id}", status_code=status.HTTP_200_OK, response_model=schemas.AccountResponse)
+async def update_account(id: Annotated[int, Path()], account: schemas.UpdateAccount, db: AsyncSession = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
+    
+    stmt = select(models.Account).filter(models.Account.id == id, models.Account.owner_id == current_user.id)
+    result = await db.execute(stmt)
+    account_exists = result.scalars().first()
+
+    if not account_exists:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No matching account found!"
+        )
+    
+    stmt = update(models.Account).where(models.Account.id == id).values(**account.model_dump()).execution_options(synchronize_session="fetch").returning(models.Account)
+    result = await db.execute(stmt)
+    account = result.scalars().first()
+
+    return account
