@@ -72,7 +72,7 @@ async def signup(user: schemas.CreateUser, db: AsyncSession = Depends(get_db)):
 
     verification_token = verification.generate_confirmation_token(email=new_user.email)
     email_confirmation_url = f"{router.prefix}/verify/{verification_token}"
-    email_template = smtp.EmailTemplates.EMAIL_VERIFICATION_TEMPLATE
+    email_template = smtp.EmailTemplates.SIGNUP_EMAIL_VERIFICATION_TEMPLATE
 
     email_template = email_template.replace(
         "email_confirmation_url", email_confirmation_url
