@@ -78,7 +78,7 @@ async def signup(user: schemas.CreateUser, db: AsyncSession = Depends(get_db)):
         "email_confirmation_url", email_confirmation_url
     )
 
-    smtp.send_email(
+    await smtp.send_email(
         to=new_user.email, subject="Email Confirmation", content=email_template
     )
 
@@ -120,7 +120,7 @@ async def update_user(
             "email_confirmation_url", email_confirmation_url
         )
 
-        smtp.send_email(
+        await smtp.send_email(
             to=updated_user.email, subject="Email Confirmation", content=email_template
         )
 
