@@ -3,7 +3,7 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
-from fastapi import APIRouter, Body, Depends, HTTPException, status, Path
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, status, Path
 
 from .. import models, schemas
 from ..database import get_db
@@ -41,10 +41,12 @@ async def add_account(
 @router.get("/get_all", response_model=list[schemas.AccountResponse])
 async def get_accounts(
     db: Annotated[AsyncSession, Depends(get_db)],
+    limit: Annotated[int, Query(default=10)],
+    offset: Annotated[int, Query(default=0)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
-    stmt = select(models.Account).where(models.Account.owner_id == current_user.id)
+    stmt = select(models.Account).where(models.Account.owner_id == current_user.id).offset(offset).limit(limit)
     result = await db.execute(stmt)
     accounts = result.scalars().all()
 
