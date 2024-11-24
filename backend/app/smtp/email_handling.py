@@ -19,7 +19,7 @@ async def send_email(
         hostname=application_settings.smtp_server_host,
         port=application_settings.smtp_server_port,
     )
-    
+
     await smtp_client.connect()
     await smtp_client.login(
         application_settings.smtp_server_login,

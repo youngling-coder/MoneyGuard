@@ -3,7 +3,7 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
-from fastapi import APIRouter, Depends, HTTPException, status, Path
+from fastapi import APIRouter, Body, Depends, HTTPException, status, Path
 
 from .. import models, schemas
 from ..database import get_db
@@ -14,9 +14,9 @@ router = APIRouter(prefix="/accounts", tags=["Accounts"])
 
 @router.post("/add", status_code=status.HTTP_201_CREATED)
 async def add_account(
-    account: schemas.CreateAccount,
-    db: AsyncSession = Depends(get_db),
-    current_user: models.User = Depends(oauth2.get_current_user),
+    account: Annotated[schemas.CreateAccount, Body()],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
     stmt = select(models.Account).filter(
@@ -40,8 +40,8 @@ async def add_account(
 
 @router.get("/get_all", response_model=list[schemas.AccountResponse])
 async def get_accounts(
-    db: AsyncSession = Depends(get_db),
-    current_user: models.User = Depends(oauth2.get_current_user),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
     stmt = select(models.Account).where(models.Account.owner_id == current_user.id)
@@ -54,8 +54,8 @@ async def get_accounts(
 @router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_account(
     id: Annotated[int, Path()],
-    db: AsyncSession = Depends(get_db),
-    current_user: models.User = Depends(oauth2.get_current_user),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
     stmt = select(models.Account).filter(
@@ -81,9 +81,9 @@ async def delete_account(
 )
 async def update_account(
     id: Annotated[int, Path()],
-    account: schemas.UpdateAccount,
-    db: AsyncSession = Depends(get_db),
-    current_user: models.User = Depends(oauth2.get_current_user),
+    account: Annotated[schemas.UpdateAccount, Body()],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
     stmt = select(models.Account).filter(

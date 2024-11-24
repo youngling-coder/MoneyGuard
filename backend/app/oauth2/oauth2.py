@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Annotated
 from datetime import timezone
 from datetime import datetime, timedelta
 
@@ -53,7 +53,7 @@ def verify_access_token(
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    db: Annotated[AsyncSession, Depends(get_db)], token: str = Depends(oauth2_scheme)
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
