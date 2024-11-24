@@ -41,9 +41,9 @@ async def add_account(
 @router.get("/get_all", response_model=list[schemas.AccountResponse])
 async def get_accounts(
     db: Annotated[AsyncSession, Depends(get_db)],
-    limit: Annotated[int, Query(default=10)],
-    offset: Annotated[int, Query(default=0)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+    limit: Annotated[int, Query()] = 10,
+    offset: Annotated[int, Query()] = 0
 ):
 
     stmt = select(models.Account).where(models.Account.owner_id == current_user.id).offset(offset).limit(limit)
