@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel
 from .user import UserResponse
 
@@ -10,4 +9,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: Optional[int]
+    id: int | None

@@ -1,14 +1,13 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from ..custom_types import TransactionType
-from typing import Optional
 
 
 class Transaction(BaseModel):
     amount: int
-    description: Optional[str]
+    description: str | None
     type: TransactionType
-    recipient: Optional[str]
+    recipient: str | None
 
 
 class CreateTransaction(Transaction):

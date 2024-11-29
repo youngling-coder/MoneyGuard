@@ -1,4 +1,4 @@
-from typing import Optional, Annotated
+from typing import Annotated
 from datetime import timezone
 from datetime import datetime, timedelta
 
@@ -32,7 +32,7 @@ def create_token(data: dict):
 
 def verify_access_token(
     token: str, credentials_exception: HTTPException
-) -> Optional[TokenData]:
+) -> TokenData | None:
     try:
         payload = jwt.decode(
             token,
@@ -61,7 +61,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    token_data: Optional[TokenData] = verify_access_token(
+    token_data: TokenData | None = verify_access_token(
         token=token, credentials_exception=credentials_exception
     )
 

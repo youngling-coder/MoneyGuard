@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 from .account import AccountResponse
 from datetime import datetime
-from typing import Optional, List
+from typing import List
 
 
 class User(BaseModel):
@@ -16,15 +16,15 @@ class CreateUser(User):
 
 class UpdateUser(User):
     email: EmailStr
-    profession: Optional[str]
-    country: Optional[str]
-    city: Optional[str]
-    birthdate: Optional[datetime]
+    profession: str | None
+    country: str | None
+    city: str | None
+    birthdate: datetime | None
 
 
 class UserResponse(UpdateUser):
     id: int
-    profile_picture: Optional[str]
+    profile_picture: str | None
     timestamp: datetime
     accounts: List[AccountResponse]
 

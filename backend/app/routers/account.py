@@ -43,10 +43,15 @@ async def get_accounts(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
     limit: Annotated[int, Query()] = 10,
-    offset: Annotated[int, Query()] = 0
+    offset: Annotated[int, Query()] = 0,
 ):
 
-    stmt = select(models.Account).where(models.Account.owner_id == current_user.id).offset(offset).limit(limit)
+    stmt = (
+        select(models.Account)
+        .where(models.Account.owner_id == current_user.id)
+        .offset(offset)
+        .limit(limit)
+    )
     result = await db.execute(stmt)
     accounts = result.scalars().all()
 

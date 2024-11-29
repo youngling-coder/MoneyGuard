@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from .base import Base
 from sqlalchemy import Date, String, Boolean, text
@@ -21,12 +21,12 @@ class User(Base):
     )
     name: Mapped[str] = mapped_column(String, nullable=False)
     surname: Mapped[str] = mapped_column(String, nullable=False)
-    profession: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    profession: Mapped[str | None] = mapped_column(String, nullable=True)
     password: Mapped[str] = mapped_column(String, nullable=False)
-    country: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    city: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    birthdate: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
-    profile_picture: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    country: Mapped[str | None] = mapped_column(String, nullable=True)
+    city: Mapped[str | None] = mapped_column(String, nullable=True)
+    birthdate: Mapped[Date | None] = mapped_column(Date, nullable=True)
+    profile_picture: Mapped[str | None] = mapped_column(String, nullable=True)
     accounts: Mapped[list["Account"]] = relationship("Account", back_populates="owner")
 
     def __repr__(self) -> str:
