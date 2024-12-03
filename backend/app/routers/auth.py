@@ -1,13 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ..oauth2.login_form import OAuth2EmailRequestForm
 from ..oauth2 import oauth2
 from ..database import get_db
-from .. import models, utils
+from .. import models, utils, schemas
 
 
 router = APIRouter(tags=["Authentication"])
@@ -16,7 +15,7 @@ router = APIRouter(tags=["Authentication"])
 @router.post("/login")
 async def login(
     db: Annotated[AsyncSession, Depends(get_db)],
-    user_credentials: OAuth2EmailRequestForm = Depends(),
+    user_credentials: Annotated[schemas.LoginUser, Form()],
 ):
 
     stmt = select(models.User).filter(models.User.email == user_credentials.email)
