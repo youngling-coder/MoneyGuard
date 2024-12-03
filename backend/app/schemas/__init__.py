@@ -1,6 +1,7 @@
 __all__ = (
     "CreateUser",
     "UpdateUser",
+    "LoginUser",
     "UpdatePassword",
     "UserResponse",
     "CreateAccount",
@@ -15,6 +16,7 @@ __all__ = (
 
 from .user import CreateUser
 from .user import UpdateUser
+from .user import LoginUser
 from .user import UserResponse
 from .user import UpdatePassword
 
