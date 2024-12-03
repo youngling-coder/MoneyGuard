@@ -9,10 +9,12 @@ class User(BaseModel):
     surname: str
 
 
-class CreateUser(User):
+class LoginUser(BaseModel):
     email: EmailStr
     password: str
 
+class CreateUser(User, LoginUser):
+    pass
 
 class UpdateUser(User):
     email: EmailStr
