@@ -13,8 +13,10 @@ class LoginUser(BaseModel):
     email: EmailStr
     password: str
 
+
 class CreateUser(User, LoginUser):
     pass
+
 
 class UpdateUser(User):
     email: EmailStr

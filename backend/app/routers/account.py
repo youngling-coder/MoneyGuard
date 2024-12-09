@@ -59,43 +59,50 @@ async def get_accounts(
 
 
 @router.get("/total_balance")
-async def get_total_balance(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[models.User, Depends(oauth2.get_current_user)]):
-    
-    stmt = select(models.Account.balance).filter(models.Account.owner_id == current_user.id)
+async def get_total_balance(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+):
+
+    stmt = select(models.Account.balance).filter(
+        models.Account.owner_id == current_user.id
+    )
     result = await db.execute(stmt)
     balances = result.scalars().all()
 
     if not balances:
 
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Account not found!"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Account not found!"
         )
 
     return sum(balances)
 
 
 @router.get("/{id}", response_model=schemas.AccountResponse)
-async def get_account(id: Annotated[int, Path()], db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[models.User, Depends(oauth2.get_current_user)]):
+async def get_account(
+    id: Annotated[int, Path()],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+):
 
     stmt = select(models.Account).where(models.Account.id == id)
     result = await db.execute(stmt)
     account = result.scalars().first()
-    
+
     if not account:
-        
+
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Account not found!"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Account not found!"
         )
 
     if account.owner_id != current_user.id:
 
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to get access to this account!"
+            detail="Not authorized to get access to this account!",
         )
-    
+
     return account
 
 
