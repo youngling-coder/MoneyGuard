@@ -58,6 +58,23 @@ async def get_accounts(
     return accounts
 
 
+@router.get("/total_balance")
+async def get_total_balance(db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[models.User, Depends(oauth2.get_current_user)]):
+    
+    stmt = select(models.Account.balance).filter(models.Account.owner_id == current_user.id)
+    result = await db.execute(stmt)
+    balances = result.scalars().all()
+
+    if not balances:
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Account not found!"
+        )
+
+    return sum(balances)
+
+
 @router.get("/{id}", response_model=schemas.AccountResponse)
 async def get_account(id: Annotated[int, Path()], db: Annotated[AsyncSession, Depends(get_db)], current_user: Annotated[models.User, Depends(oauth2.get_current_user)]):
 
@@ -69,7 +86,7 @@ async def get_account(id: Annotated[int, Path()], db: Annotated[AsyncSession, De
         
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Account not found"
+            detail="Account not found!"
         )
 
     if account.owner_id != current_user.id:
@@ -97,7 +114,7 @@ async def delete_account(
 
     if not account_exists:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No matching account found!"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Account not found!"
         )
 
     stmt = delete(models.Account).where(models.Account.id == id)
@@ -125,7 +142,7 @@ async def update_account(
 
     if not account_exists:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No matching account found!"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Account not found!"
         )
 
     stmt = (
