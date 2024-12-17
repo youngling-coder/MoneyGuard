@@ -35,6 +35,11 @@ class UserResponse(UpdateUser):
     model_config = ConfigDict(from_attributes=True)
 
 
+class VerifySecurityCode(BaseModel):
+    email: EmailStr
+    security_code: str
+
+    
 class ResetPassword(BaseModel):
     email: str
     new_password: str
