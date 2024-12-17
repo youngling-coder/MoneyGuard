@@ -1,4 +1,9 @@
-__all__ = ("get_hash", "verify_hash", "get_profile_picture_url", "generate_security_code")
+__all__ = (
+    "get_hash",
+    "verify_hash",
+    "get_profile_picture_url",
+    "generate_security_code",
+)
 
 from .hash import get_hash
 from .hash import verify_hash
