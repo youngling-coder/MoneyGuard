@@ -61,11 +61,43 @@ async def verify_security_code(security_code_data: Annotated[schemas.user.Verify
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid security code!"
+            detail="Security code is invalid!"
         )
     
     user.security_code_verified = True
     user.security_code = None
+
+    await db.commit()
+    await db.refresh(user)
+
+
+@router.patch("/reset_password", status_code=status.HTTP_204_NO_CONTENT)
+async def reset_password(
+    reset_password_data: Annotated[schemas.ResetPassword, Body()],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+
+    stmt = select(models.User).filter(models.User.email == reset_password_data.email)
+    result = await db.execute(stmt)
+    user = result.scalars().first()
+
+    if not user:
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found!"
+        )
+    
+    if not user.security_code_verified:
+        
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Security code is invalid!"
+        )
+
+    new_password = utils.get_password_hash(reset_password_data.new_password)
+
+    user.password = new_password
+    user.security_code_verified = False
 
     await db.commit()
     await db.refresh(user)
