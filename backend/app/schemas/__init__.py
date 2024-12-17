@@ -6,6 +6,7 @@ __all__ = (
     "UserResponse",
     "CreateAccount",
     "UpdateAccount",
+    "VerifySecurityCode",
     "AccountResponse",
     "CreateTransaction",
     "UpdateTransaction",
@@ -19,6 +20,7 @@ from .user import UpdateUser
 from .user import LoginUser
 from .user import UserResponse
 from .user import ResetPassword
+from .user import VerifySecurityCode
 
 from .account import CreateAccount
 from .account import UpdateAccount
