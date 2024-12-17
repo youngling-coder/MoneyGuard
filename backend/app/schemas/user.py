@@ -39,7 +39,7 @@ class VerifySecurityCode(BaseModel):
     email: EmailStr
     security_code: str
 
-    
+
 class ResetPassword(BaseModel):
     email: str
     new_password: str

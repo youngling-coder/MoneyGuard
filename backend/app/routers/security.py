@@ -44,7 +44,10 @@ async def send_security_code(
 
 
 @router.post("/verify_security_code", status_code=status.HTTP_200_OK)
-async def verify_security_code(security_code_data: Annotated[schemas.user.VerifySecurityCode, Body()], db: Annotated[AsyncSession, Depends(get_db)]):
+async def verify_security_code(
+    security_code_data: Annotated[schemas.user.VerifySecurityCode, Body()],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
 
     stmt = select(models.User).filter(models.User.email == security_code_data.email)
     result = await db.execute(stmt)
@@ -53,17 +56,15 @@ async def verify_security_code(security_code_data: Annotated[schemas.user.Verify
     if not user:
 
         return HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found!"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found!"
         )
-    
+
     if not utils.verify_hash(security_code_data.security_code, user.security_code):
 
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Security code is invalid!"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Security code is invalid!"
         )
-    
+
     user.security_code_verified = True
     user.security_code = None
 
@@ -84,12 +85,11 @@ async def reset_password(
     if not user:
 
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found!"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found!"
         )
-    
+
     if not user.security_code_verified:
-        
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Security code is invalid!"
         )

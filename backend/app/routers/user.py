@@ -179,7 +179,7 @@ async def delete_user(
 
 @router.patch("/password", status_code=status.HTTP_204_NO_CONTENT)
 async def update_passowrd(
-    password_form: Annotated[schemas.UpdatePassword, Body()],
+    password_form: Annotated[schemas.ResetPassword, Body()],
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
