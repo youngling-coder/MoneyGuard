@@ -31,8 +31,8 @@ async def send_security_code(
 
     security_code = utils.generate_security_code(length=6)
 
-    content = smtp.EmailTemplates.RESET_PASSWORD_VERIFICATION_CODE_TEMPLATE
-    content = content.replace("verification_code", security_code)
+    content = smtp.EmailTemplates.RESET_PASSWORD_SECURITY_CODE_TEMPLATE
+    content = content.replace("security_code", security_code)
 
     user.security_code = utils.get_hash(security_code)
     await db.commit()
@@ -94,7 +94,7 @@ async def reset_password(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Security code is invalid!"
         )
 
-    new_password = utils.get_password_hash(reset_password_data.new_password)
+    new_password = utils.get_hash(reset_password_data.new_password)
 
     user.password = new_password
     user.security_code_verified = False
