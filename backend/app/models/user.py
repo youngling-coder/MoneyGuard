@@ -28,7 +28,9 @@ class User(Base):
     birthdate: Mapped[Date | None] = mapped_column(Date, nullable=True)
     profile_picture: Mapped[str | None] = mapped_column(String, nullable=True)
     security_code: Mapped[str | None] = mapped_column(String, nullable=True)
-    security_code_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"), default=False)
+    security_code_verified: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, server_default=text("false"), default=False
+    )
     accounts: Mapped[list["Account"]] = relationship("Account", back_populates="owner")
 
     def __repr__(self) -> str:

@@ -9,4 +9,3 @@ def get_hash(plain: str) -> str:
 
 def verify_hash(plain: str, hash: str) -> bool:
     return crypto_context.verify(plain, hash)
-    
