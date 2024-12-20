@@ -16,10 +16,11 @@ router = APIRouter(prefix="/security", tags=["Security"])
 
 @router.post("/send_security_code", status_code=status.HTTP_200_OK)
 async def send_security_code(
-    email: Annotated[EmailStr, Body()], db: Annotated[AsyncSession, Depends(get_db)]
+    security_code_data: Annotated[schemas.SendSecurityCode, Body()],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ):
 
-    stmt = select(models.User).filter(models.User.email == email)
+    stmt = select(models.User).filter(models.User.email == security_code_data.email)
     result = await db.execute(stmt)
     user = result.scalars().first()
 
@@ -35,11 +36,15 @@ async def send_security_code(
     content = content.replace("security_code", security_code)
 
     user.security_code = utils.get_hash(security_code)
+    user.security_code_verified = False
+
     await db.commit()
     await db.refresh(user)
 
     await smtp.send_email(
-        to=email, subject="Your security code for password reset", content=content
+        to=security_code_data.email,
+        subject="Your security code for password reset",
+        content=content,
     )
 
 

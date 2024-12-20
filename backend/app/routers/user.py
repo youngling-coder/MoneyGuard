@@ -74,7 +74,7 @@ async def create_user(
             detail="User with a given email already exists!",
         )
 
-    hashed_password = utils.get_hash(password=user.password)
+    hashed_password = utils.get_hash(user.password)
 
     new_user = models.User(**user.model_dump())
     new_user.password = hashed_password
