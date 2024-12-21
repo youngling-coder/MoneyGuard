@@ -21,7 +21,7 @@ from ..database import get_db
 from ..oauth2 import oauth2
 
 
-router = APIRouter(prefix="/security_code_session", tags=["Security Code Session"])
+router = APIRouter(prefix="/security_code_sessions", tags=["Security Code Session"])
 
 
 @router.post(
@@ -81,3 +81,35 @@ async def create_security_code_session(
         httponly=True,
         samesite="strict",
     )
+
+
+@router.post("/verify", status_code=status.HTTP_200_OK)
+async def verify_security_code_session(
+    security_code_data: Annotated[schemas.VerifySecurityCodeSession, Body()],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    security_code_session_token: str = Cookie()
+):
+
+    stmt = select(models.Security_Code_Session).filter(
+        models.Security_Code_Session.security_code_session_token == security_code_session_token
+    )
+    result = await db.execute(stmt)
+    security_code_session = result.scalars().first()
+
+    if not security_code_session:
+
+        return HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found!"
+        )
+
+    if not utils.verify_hash(
+        security_code_data.security_code, security_code_session.security_code
+    ):
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Security code is invalid!"
+        )
+
+    security_code_session.security_code_verified = True
+    await db.commit()
+    await db.refresh(security_code_session)
