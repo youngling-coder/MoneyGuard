@@ -28,7 +28,7 @@ async def login(
             detail=f"Seems there's no user with a given email! Double check spelling!",
         )
 
-    if not utils.verify_password(user_credentials.password, user.password):
+    if not utils.verify_hash(user_credentials.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid password for an account with a given email!",

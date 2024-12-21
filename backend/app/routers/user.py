@@ -74,7 +74,7 @@ async def create_user(
             detail="User with a given email already exists!",
         )
 
-    hashed_password = utils.get_password_hash(password=user.password)
+    hashed_password = utils.get_hash(plain=user.password)
 
     new_user = models.User(**user.model_dump())
     new_user.password = hashed_password
@@ -186,12 +186,12 @@ async def update_passowrd(
     result_user = await db.execute(stmt_user)
     user = result_user.scalars().first()
 
-    if not utils.verify_password(password_form.old_password, user.password):
+    if not utils.verify_hash(password_form.old_password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Old password is wrong!"
         )
 
-    new_password = utils.get_password_hash(password_form.new_password)
+    new_password = utils.get_hash(password_form.new_password)
 
     stmt = (
         update(models.User)
