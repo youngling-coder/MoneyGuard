@@ -3,7 +3,17 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, status, Path, Response, Cookie
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    HTTPException,
+    Query,
+    status,
+    Path,
+    Response,
+    Cookie,
+)
 from fastapi.responses import JSONResponse
 
 from .. import models, schemas, utils, smtp
@@ -11,10 +21,7 @@ from ..database import get_db
 from ..oauth2 import oauth2
 
 
-router = APIRouter(
-    prefix="/security_code_session",
-    tags=["Security Code Session"]
-)
+router = APIRouter(prefix="/security_code_session", tags=["Security Code Session"])
 
 
 @router.post(
@@ -67,4 +74,10 @@ async def create_security_code_session(
         content=content,
     )
 
-    response.set_cookie(key="security_code_session_token", value=security_code_session_token, secure=True, httponly=True, samesite="strict")
+    response.set_cookie(
+        key="security_code_session_token",
+        value=security_code_session_token,
+        secure=True,
+        httponly=True,
+        samesite="strict",
+    )

@@ -34,7 +34,7 @@ If you do not have a MoneyGuard account, please ignore this email.
 {SIGNATURE}
 """
 
-    SECURITY_CODE_REQUEST_TEMPLATE = f"""\
+    SECURITY_CODE_SESSION_REQUEST_TEMPLATE = f"""\
 A verification code was requested for your MoneyGuard account. 
 If you made this request, please use the verification code below to proceed:
     
