@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from .user import UserResponse
+from .user import UserBaseResponse
 
 
 class Token(BaseModel):
     access_token: str
     token_type: str
-    user: UserResponse
+    user: UserBaseResponse
 
 
 class TokenData(BaseModel):

@@ -96,7 +96,7 @@ async def create_user(
 
 
 @router.put(
-    "/update", status_code=status.HTTP_200_OK, response_model=schemas.UserResponse
+    "/update", status_code=status.HTTP_200_OK, response_model=schemas.UserBaseResponse
 )
 async def update_user(
     user: Annotated[schemas.UpdateUser, Body()],
@@ -119,8 +119,6 @@ async def update_user(
 
     updated_user = updated_user_result.scalars().first()
 
-    await db.refresh(updated_user, ["accounts"])
-
     if email_updated:
         verification_token = verification.generate_confirmation_token(
             email=updated_user.email
@@ -139,7 +137,7 @@ async def update_user(
     return updated_user
 
 
-@router.get("/get", response_model=schemas.UserResponse)
+@router.get("/get", response_model=schemas.UserBaseResponse)
 async def get_user(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],

@@ -3,7 +3,8 @@ __all__ = (
     "UpdateUser",
     "LoginUser",
     "UpdatePassword",
-    "UserResponse",
+    "UserBaseResponse",
+    "UserAccountsResponse",
     "CreateAccount",
     "UpdateAccount",
     "AccountResponse",
@@ -17,7 +18,8 @@ __all__ = (
 from .user import CreateUser
 from .user import UpdateUser
 from .user import LoginUser
-from .user import UserResponse
+from .user import UserBaseResponse
+from .user import UserAccountsResponse
 from .user import UpdatePassword
 
 from .account import CreateAccount
