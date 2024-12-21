@@ -12,3 +12,7 @@ class RequestSecurityCodeSession(SecurityCodeSession):
 class CreateSecurityCodeSession(BaseModel):
     security_code_session_token: str | None = None
     security_code: str | None = None
+
+
+class VerifySecurityCodeSession(BaseModel):
+    security_code: str
