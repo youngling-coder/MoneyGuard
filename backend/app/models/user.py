@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 if TYPE_CHECKING:
     from .account import Account
+    from .security_code_session import Security_Code_Session
 
 
 class User(Base):
@@ -28,6 +29,7 @@ class User(Base):
     birthdate: Mapped[Date | None] = mapped_column(Date, nullable=True)
     profile_picture: Mapped[str | None] = mapped_column(String, nullable=True)
     accounts: Mapped[list["Account"]] = relationship("Account", back_populates="owner")
+    security_code_session: Mapped["Security_Code_Session"] = relationship("Security_Code_Session", back_populates="owner")
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (id={self.id}, name="{self.name}")'
