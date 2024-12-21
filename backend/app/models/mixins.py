@@ -17,7 +17,7 @@ class UserRelationMixin:
     @declared_attr
     def owner_id(cls) -> Mapped[int]:
         return mapped_column(
-            ForeignKey("users.id"),
+            ForeignKey("users.id", ondelete="CASCADE"),
             unique=cls._user_id_unique,
             nullable=cls._user_id_nullable,
         )
@@ -36,7 +36,7 @@ class AccountRelationMixin:
     @declared_attr
     def owner_id(cls) -> Mapped[int]:
         return mapped_column(
-            ForeignKey("accounts.id"),
+            ForeignKey("accounts.id", ondelete="CASCADE"),
             unique=cls._account_id_unique,
             nullable=cls._account_id_nullable,
         )
