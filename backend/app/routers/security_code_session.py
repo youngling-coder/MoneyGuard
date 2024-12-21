@@ -106,7 +106,8 @@ async def verify_security_code_session(
 ):
 
     stmt = select(models.Security_Code_Session).filter(
-        models.Security_Code_Session.security_code_session_token == security_code_session_token
+        models.Security_Code_Session.security_code_session_token
+        == security_code_session_token
     )
     result = await db.execute(stmt)
     security_code_session = result.scalars().first()
@@ -125,6 +126,6 @@ async def verify_security_code_session(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Security code is invalid!"
         )
 
-    security_code_session.security_code_verified = True
+    security_code_session.is_verified = True
     await db.commit()
     await db.refresh(security_code_session)
