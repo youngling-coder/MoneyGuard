@@ -1,5 +1,5 @@
-__all__ = ("get_password_hash", "verify_password", "get_profile_picture_url")
+__all__ = ("get_hash", "verify_hash", "get_profile_picture_url")
 
-from .password import get_password_hash
-from .password import verify_password
+from .hash import get_hash
+from .hash import verify_hash
 from .profile_picture import get_profile_picture_url
