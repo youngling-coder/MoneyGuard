@@ -34,17 +34,18 @@ If you do not have a MoneyGuard account, please ignore this email.
 {SIGNATURE}
 """
 
-    RESET_PASSWORD_VERIFICATION_CODE_TEMPATE = f"""
-We received a request to reset your password for your MoneyGuard account.
+    SECURITY_CODE_REQUEST_TEMPLATE = f"""\
+A verification code was requested for your MoneyGuard account. 
 If you made this request, please use the verification code below to proceed:
-    CODE: verification_code
+    
+    security_code
 
-If you did not request a password reset, please follow these steps to secure your account:
+If you did not request this code, please choose and follow on of these steps to secure your account:
 
-1. Log in to your account immediately and change your password.
-2. Contact our support team if you suspect unauthorized activity.
+    1. Log in to your account immediately and change your password.
+    2. Contact our support team if you suspect unauthorized activity.
 
-If you do not have a MoneyGuard account, please ignore this email.  
+If you do not have a MoneyGuard account, please ignore this email.
 
 {SIGNATURE}
 """
