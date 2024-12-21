@@ -26,12 +26,14 @@ class UpdateUser(User):
     birthdate: datetime | None
 
 
-class UserResponse(UpdateUser):
+class UserBaseResponse(UpdateUser):
     id: int
     profile_picture: str | None
     timestamp: datetime
-    accounts: List[AccountResponse]
 
+
+class UserAccountsResponse(UserBaseResponse):
+    accounts: List[AccountResponse] | None = None
     model_config = ConfigDict(from_attributes=True)
 
 
