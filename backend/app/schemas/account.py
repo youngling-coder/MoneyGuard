@@ -21,9 +21,11 @@ class AccountBaseResponse(Account):
     balance: int
     timestamp: datetime
 
+
 class AccountTransactionsResponse(AccountBaseResponse):
     transactions: List[TransactionResponse]
     model_config = ConfigDict(from_attributes=True)
+
 
 class UpdateAccount(Account):
     pass

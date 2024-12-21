@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
-from .account import AccountResponse
+from .account import AccountBaseResponse
 from datetime import datetime
 from typing import List
 
@@ -33,7 +33,7 @@ class UserBaseResponse(UpdateUser):
 
 
 class UserAccountsResponse(UserBaseResponse):
-    accounts: List[AccountResponse] | None = None
+    accounts: List[AccountBaseResponse]
     model_config = ConfigDict(from_attributes=True)
 
 

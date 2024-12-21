@@ -38,7 +38,7 @@ async def add_account(
     await db.commit()
 
 
-@router.get("/get_all", response_model=list[schemas.AccountResponse])
+@router.get("/get_all", response_model=list[schemas.AccountBaseResponse])
 async def get_accounts(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
@@ -79,7 +79,7 @@ async def get_total_balance(
     return sum(balances)
 
 
-@router.get("/{id}", response_model=schemas.AccountResponse)
+@router.get("/{id}", response_model=schemas.AccountBaseResponse)
 async def get_account(
     id: Annotated[int, Path()],
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -132,7 +132,7 @@ async def delete_account(
 @router.put(
     "/update/{id}",
     status_code=status.HTTP_200_OK,
-    response_model=schemas.AccountResponse,
+    response_model=schemas.AccountBaseResponse,
 )
 async def update_account(
     id: Annotated[int, Path()],

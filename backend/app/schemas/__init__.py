@@ -7,7 +7,8 @@ __all__ = (
     "UserAccountsResponse",
     "CreateAccount",
     "UpdateAccount",
-    "AccountResponse",
+    "AccountBaseResponse",
+    "AccountTransactionsResponse",
     "CreateTransaction",
     "UpdateTransaction",
     "TransactionResponse",
@@ -24,7 +25,9 @@ from .user import UpdatePassword
 
 from .account import CreateAccount
 from .account import UpdateAccount
-from .account import AccountResponse
+from .account import AccountBaseResponse
+from .account import AccountTransactionsResponse
+
 
 from .transaction import CreateTransaction
 from .transaction import UpdateTransaction
