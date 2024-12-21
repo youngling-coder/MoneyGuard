@@ -6,8 +6,10 @@ from PIL import Image
 from fastapi import (
     APIRouter,
     Body,
+    Cookie,
     Depends,
     HTTPException,
+    Response,
     status,
     File,
     UploadFile,
@@ -175,33 +177,63 @@ async def delete_user(
     await db.commit()
 
 
-@router.patch("/password", status_code=status.HTTP_204_NO_CONTENT)
-async def update_passowrd(
-    password_form: Annotated[schemas.UpdatePassword, Body()],
+@router.patch("/reset_password", status_code=status.HTTP_204_NO_CONTENT)
+async def reset_password(
+    response: Response,
+    reset_password_data: Annotated[schemas.ResetPassword, Body()],
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+    security_code_session_token: str = Cookie(None),
 ):
 
-    stmt_user = select(models.User).filter(models.User.id == current_user.id)
-    result_user = await db.execute(stmt_user)
-    user = result_user.scalars().first()
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials!"
+    )
+    token_data = oauth2.verify_access_token(
+        security_code_session_token,
+        credentials_exception=credentials_exception,
+    )
+    stmt = select(models.User).filter(models.User.id == token_data.id)
+    result = await db.execute(stmt)
+    user = result.scalars().first()
 
-    if not utils.verify_hash(password_form.old_password, user.password):
+    if not user:
+
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Old password is wrong!"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found!"
         )
 
-    new_password = utils.get_hash(password_form.new_password)
-
-    stmt = (
-        update(models.User)
-        .where(models.User.id == current_user.id)
-        .execution_options(synchronize_session="fetch")
-        .values(password=new_password)
+    security_code_session_stmt = select(models.Security_Code_Session).filter(
+        models.Security_Code_Session.security_code_session_token
+        == security_code_session_token
     )
+    security_code_session_result = await db.execute(security_code_session_stmt)
+    security_code_session = security_code_session_result.scalars().first()
 
-    await db.execute(stmt)
+    if not security_code_session:
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Security code session not found!",
+        )
+
+    if not security_code_session.security_code_verified:
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Security code is invalid!"
+        )
+
+    new_password = utils.get_hash(reset_password_data.new_password)
+
+    user.password = new_password
+
+    security_code_session_delete_stmt = delete(models.Security_Code_Session).where(
+        models.Security_Code_Session.id == security_code_session.id
+    )
+    await db.execute(security_code_session_delete_stmt)
     await db.commit()
+    await db.refresh(user)
+
+    response.delete_cookie("security_code_session_token")
 
 
 @router.patch("/profile_picture")
