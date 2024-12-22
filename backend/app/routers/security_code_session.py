@@ -102,7 +102,7 @@ async def create_security_code_session(
 async def verify_security_code_session(
     security_code_data: Annotated[schemas.VerifySecurityCodeSession, Body()],
     db: Annotated[AsyncSession, Depends(get_db)],
-    security_code_session_token: str = Cookie()
+    security_code_session_token: Annotated[str, Cookie()] = None,
 ):
 
     stmt = select(models.Security_Code_Session).filter(
@@ -114,7 +114,7 @@ async def verify_security_code_session(
 
     if not security_code_session:
 
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found!"
         )
 
@@ -127,5 +127,6 @@ async def verify_security_code_session(
         )
 
     security_code_session.is_verified = True
+
     await db.commit()
     await db.refresh(security_code_session)
