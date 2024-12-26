@@ -9,10 +9,10 @@ class RequestSecurityCodeSession(SecurityCodeSession):
     pass
 
 
-class CreateSecurityCodeSession(BaseModel):
-    security_code_session_token: str | None = None
-    security_code: str | None = None
-
-
 class VerifySecurityCodeSession(BaseModel):
+    security_code_session_token: str
     security_code: str
+
+
+class CreateSecurityCodeSession(VerifySecurityCodeSession):
+    pass

@@ -24,9 +24,7 @@ router = APIRouter(prefix="/security_code_sessions", tags=["Security Code Sessio
     status_code=status.HTTP_200_OK,
 )
 async def create_security_code_session(
-    security_code_session_data: Annotated[
-        schemas.RequestSecurityCodeSession, Body()
-    ],
+    security_code_session_data: Annotated[schemas.RequestSecurityCodeSession, Body()],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
 
@@ -83,9 +81,12 @@ async def create_security_code_session(
         content=content,
     )
 
-    return JSONResponse({
-        "security_code_session_token": security_code_session_token,
-    })
+    return JSONResponse(
+        {
+            "security_code_session_token": security_code_session_token,
+        }
+    )
+
 
 @router.post("/verify", status_code=status.HTTP_200_OK)
 async def verify_security_code_session(

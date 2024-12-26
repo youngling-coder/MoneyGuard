@@ -179,17 +179,15 @@ async def delete_user(
 
 @router.patch("/reset_password", status_code=status.HTTP_204_NO_CONTENT)
 async def reset_password(
-    response: Response,
     reset_password_data: Annotated[schemas.ResetPassword, Body()],
     db: Annotated[AsyncSession, Depends(get_db)],
-    security_code_session_token: str = Cookie(None),
 ):
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials!"
     )
     token_data = oauth2.verify_access_token(
-        security_code_session_token,
+        reset_password_data.security_code_session_token,
         credentials_exception=credentials_exception,
     )
     stmt = select(models.User).filter(models.User.id == token_data.id)
@@ -204,7 +202,7 @@ async def reset_password(
 
     security_code_session_stmt = select(models.Security_Code_Session).filter(
         models.Security_Code_Session.security_code_session_token
-        == security_code_session_token
+        == reset_password_data.security_code_session_token
     )
     security_code_session_result = await db.execute(security_code_session_stmt)
     security_code_session = security_code_session_result.scalars().first()
@@ -216,7 +214,7 @@ async def reset_password(
             detail="Security code session not found!",
         )
 
-    if not security_code_session.security_code_verified:
+    if not security_code_session.is_verified:
 
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Security code is invalid!"
@@ -232,8 +230,6 @@ async def reset_password(
     await db.execute(security_code_session_delete_stmt)
     await db.commit()
     await db.refresh(user)
-
-    response.delete_cookie("security_code_session_token")
 
 
 @router.patch("/profile_picture")
