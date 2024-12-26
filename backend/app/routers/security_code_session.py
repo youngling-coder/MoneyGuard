@@ -2,17 +2,12 @@ from typing import Annotated
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import delete, update
 from fastapi import (
     APIRouter,
     Body,
     Depends,
     HTTPException,
-    Query,
     status,
-    Path,
-    Response,
-    Cookie,
 )
 from fastapi.responses import JSONResponse
 
@@ -29,15 +24,14 @@ router = APIRouter(prefix="/security_code_sessions", tags=["Security Code Sessio
     status_code=status.HTTP_200_OK,
 )
 async def create_security_code_session(
-    response: Response,
-    request_security_code_session_data: Annotated[
+    security_code_session_data: Annotated[
         schemas.RequestSecurityCodeSession, Body()
     ],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
 
     stmt = select(models.User).filter(
-        models.User.email == request_security_code_session_data.email
+        models.User.email == security_code_session_data.email
     )
     result = await db.execute(stmt)
     user = result.scalars().first()
@@ -72,7 +66,7 @@ async def create_security_code_session(
 
     else:
         security_code_session = schemas.CreateSecurityCodeSession(
-            email=request_security_code_session_data.email,
+            email=security_code_session_data.email,
             security_code=security_code,
             security_code_session_token=security_code_session_token,
         )
@@ -84,30 +78,24 @@ async def create_security_code_session(
         await db.commit()
 
     await smtp.send_email(
-        to=request_security_code_session_data.email,
+        to=security_code_session_data.email,
         subject="Your security code for password reset",
         content=content,
     )
 
-    response.set_cookie(
-        key="security_code_session_token",
-        value=security_code_session_token,
-        secure=True,
-        httponly=True,
-        samesite="strict",
-    )
-
+    return JSONResponse({
+        "security_code_session_token": security_code_session_token,
+    })
 
 @router.post("/verify", status_code=status.HTTP_200_OK)
 async def verify_security_code_session(
-    security_code_data: Annotated[schemas.VerifySecurityCodeSession, Body()],
+    security_code_session_data: Annotated[schemas.VerifySecurityCodeSession, Body()],
     db: Annotated[AsyncSession, Depends(get_db)],
-    security_code_session_token: Annotated[str, Cookie()] = None,
 ):
 
     stmt = select(models.Security_Code_Session).filter(
         models.Security_Code_Session.security_code_session_token
-        == security_code_session_token
+        == security_code_session_data.security_code_session_token
     )
     result = await db.execute(stmt)
     security_code_session = result.scalars().first()
@@ -119,7 +107,7 @@ async def verify_security_code_session(
         )
 
     if not utils.verify_hash(
-        security_code_data.security_code, security_code_session.security_code
+        security_code_session_data.security_code, security_code_session.security_code
     ):
 
         raise HTTPException(
