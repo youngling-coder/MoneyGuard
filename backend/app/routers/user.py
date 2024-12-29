@@ -112,7 +112,7 @@ async def update_user(
     city: Annotated[str, Form(...)],
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
-    profile_picture: Annotated[UploadFile, File(...)],
+    profile_picture: Annotated[UploadFile, File(...)] = None,
 ):
 
     SUPPORTED_FILE_TYPES = ("image/png", "image/jpeg")
@@ -136,6 +136,7 @@ async def update_user(
 
         try:
             image.save(save_path)
+            profile_picture = utils.get_profile_picture_url(current_user.id)
 
         except Exception as ex:
 
@@ -143,8 +144,9 @@ async def update_user(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Something went wrong while image processing",
             )
-
-    profile_picture = utils.get_profile_picture_url(current_user.id)
+        
+    if not profile_picture:
+        profile_picture = current_user.profile_picture
     updated_user_schema = schemas.UpdateUser(
         name=name,
         surname=surname,
