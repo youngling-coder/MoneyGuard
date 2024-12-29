@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
 
 from .base import Base
-from sqlalchemy import Date, String, Boolean, text
+from sqlalchemy import Date, String, Boolean, text, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from ..custom_types import Gender
 
 if TYPE_CHECKING:
     from .account import Account
@@ -26,6 +26,7 @@ class User(Base):
     password: Mapped[str] = mapped_column(String, nullable=False)
     country: Mapped[str | None] = mapped_column(String, nullable=True)
     city: Mapped[str | None] = mapped_column(String, nullable=True)
+    gender: Mapped[str | None] = mapped_column(Enum(Gender), nullable=True)
     birthdate: Mapped[Date | None] = mapped_column(Date, nullable=True)
     profile_picture: Mapped[str | None] = mapped_column(String, nullable=True)
     accounts: Mapped[list["Account"]] = relationship("Account", back_populates="owner")
