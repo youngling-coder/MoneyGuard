@@ -18,7 +18,7 @@ down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-transaction_type = sa.Enum("INCOME", "EXPENSE", name="transactiontype")
+transaction_type = sa.Enum("income", "expense", name="transactiontype")
 
 
 def upgrade() -> None:
@@ -67,7 +67,7 @@ def upgrade() -> None:
         ),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column(
-            "type", sa.Enum("INCOME", "EXPENSE", name="transactiontype"), nullable=False
+            "type", transaction_type, nullable=False
         ),
         sa.Column("recipient", sa.String(), nullable=True),
         sa.Column("owner_id", sa.Integer(), nullable=False),

@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class TransactionType(Enum):
-    INCOME = "income"
-    EXPENSE = "expense"
+    income = "income"
+    expense = "expense"
 
 
 class Gender(Enum):
