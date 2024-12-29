@@ -1,3 +1,4 @@
+import os
 from pydantic_settings import BaseSettings
 
 
@@ -14,7 +15,8 @@ class ApplicationSettings(BaseSettings):
 
     profile_picture_filename: str
     profile_picture_extension: str
-    profile_picture_path: str
+    profile_pictures_path: str
+    profile_pictures_mount_point: str
 
     smtp_server_host: str
     smtp_server_port: str
@@ -28,3 +30,4 @@ class ApplicationSettings(BaseSettings):
 
 
 application_settings = ApplicationSettings()
+application_settings.profile_pictures_path = os.path.expanduser(application_settings.profile_pictures_path)
