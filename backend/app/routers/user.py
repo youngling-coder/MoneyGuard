@@ -144,7 +144,7 @@ async def update_user(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Something went wrong while image processing",
             )
-        
+
     if not profile_picture:
         profile_picture = current_user.profile_picture
     updated_user_schema = schemas.UpdateUser(
