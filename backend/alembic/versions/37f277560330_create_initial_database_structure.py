@@ -66,9 +66,7 @@ def upgrade() -> None:
             "amount", sa.BigInteger(), server_default=sa.text("0"), nullable=False
         ),
         sa.Column("description", sa.String(), nullable=True),
-        sa.Column(
-            "type", transaction_type, nullable=False
-        ),
+        sa.Column("type", transaction_type, nullable=False),
         sa.Column("recipient", sa.String(), nullable=True),
         sa.Column("owner_id", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
