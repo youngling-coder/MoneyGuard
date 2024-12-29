@@ -21,6 +21,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import update, delete
 
 from ..database import get_db
+from ..custom_types import Gender
 from .. import models, schemas, utils, smtp, verification
 from ..oauth2 import oauth2
 
@@ -104,6 +105,7 @@ async def update_user(
     name: Annotated[str, Form(...)],
     surname: Annotated[str, Form(...)],
     email: Annotated[str, Form(...)],
+    gender: Annotated[Gender, Form(...)],
     birthdate: Annotated[datetime, Form(...)],
     profession: Annotated[str, Form(...)],
     country: Annotated[str, Form(...)],
@@ -147,6 +149,7 @@ async def update_user(
         name=name,
         surname=surname,
         email=email,
+        gender=gender,
         birthdate=birthdate,
         profession=profession,
         country=country,
