@@ -24,6 +24,7 @@ class UpdateUser(User):
     country: str | None
     city: str | None
     birthdate: datetime | None
+    profile_picture: str | None
 
 
 class UserBaseResponse(UpdateUser):
