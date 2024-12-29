@@ -1,15 +1,15 @@
+from datetime import datetime
 from typing import Annotated
 from io import BytesIO
 import os
-
 from PIL import Image
+
 from fastapi import (
     APIRouter,
     Body,
-    Cookie,
     Depends,
+    Form,
     HTTPException,
-    Response,
     status,
     File,
     UploadFile,
@@ -26,7 +26,6 @@ from ..oauth2 import oauth2
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
-
 
 @router.get("/verify/{token}", status_code=status.HTTP_204_NO_CONTENT)
 async def verify_email(
@@ -101,20 +100,58 @@ async def create_user(
     "/update", status_code=status.HTTP_200_OK, response_model=schemas.UserBaseResponse
 )
 async def update_user(
-    user: Annotated[schemas.UpdateUser, Body()],
+    name: Annotated[str, Form(...)],
+    surname: Annotated[str, Form(...)],
+    email: Annotated[str, Form(...)],
+    birthdate: Annotated[datetime, Form(...)],
+    profession: Annotated[str, Form(...)],
+    country: Annotated[str, Form(...)],
+    city: Annotated[str, Form(...)],
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+    profile_picture: Annotated[UploadFile, File(...)],
 ):
 
+    SUPPORTED_FILE_TYPES = ("image/png", "image/jpeg")
+    if profile_picture:
+        if profile_picture.content_type not in SUPPORTED_FILE_TYPES:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unsupported file type. Allowed types: {SUPPORTED_FILE_TYPES}",
+            )
+
+        image_bytes = await profile_picture.read()
+
+        if len(image_bytes) > 2**20:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Image is too large! Maximal file size is {((2 ** 20) / (10 ** 6)):.2f}MB ",
+            )
+
+        image = Image.open(BytesIO(image_bytes))
+        save_path = utils.get_profile_picture_path(current_user.id)
+
+        try:
+            image.save(save_path)
+
+        except Exception as ex:
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Something went wrong while image processing",
+            )
+    
+    profile_picture = utils.get_profile_picture_url(current_user.id)
+    updated_user_schema = schemas.UpdateUser(name=name, surname=surname, email=email, birthdate=birthdate, profession=profession, country=country, city=city, profile_picture=profile_picture)
     updated_user_stmt = (
         update(models.User)
         .where(models.User.id == current_user.id)
-        .values(user.model_dump())
+        .values(updated_user_schema.model_dump())
         .execution_options(synchronize_session="fetch")
         .returning(models.User)
     )
 
-    email_updated = current_user.email != user.email
+    email_updated = current_user.email != email
 
     updated_user_result = await db.execute(updated_user_stmt)
     await db.commit()
@@ -232,58 +269,13 @@ async def reset_password(
     await db.refresh(user)
 
 
-@router.patch("/profile_picture")
-async def update_profile_picture(
-    db: Annotated[AsyncSession, Depends(get_db)],
-    profile_picture: Annotated[UploadFile, File(...)],
-    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
-):
-
-    SUPPORTED_FILE_TYPES = ("image/png", "image/jpeg")
-
-    if profile_picture.content_type not in SUPPORTED_FILE_TYPES:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Unsupported file type. Allowed types: image/jpeg, image/png",
-        )
-
-    image_bytes = await profile_picture.read()
-
-    if len(image_bytes) > 2**20:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Image is too large! Maximal file size is {((2 ** 20) / (10 ** 6)):.2f}MB ",
-        )
-
-    image = Image.open(BytesIO(image_bytes))
-    save_path = utils.get_profile_picture_url(current_user.id)
-
-    stmt = select(models.User).filter(models.User.id == current_user.id)
-    result = await db.execute(stmt)
-    user = result.scalars().first()
-
-    try:
-        image.save(save_path)
-
-        user.profile_picture = save_path
-        await db.commit()
-        await db.refresh(user)
-
-    except Exception as ex:
-
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Something went wrong while image processing",
-        )
-
-
 @router.delete("/profile_picture")
 async def delete_profile_picture(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
-    save_path = utils.get_profile_picture_url(current_user.id)
+    save_path = utils.get_profile_picture_path(current_user.id)
 
     try:
         os.remove(save_path)
