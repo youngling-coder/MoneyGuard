@@ -20,6 +20,7 @@ class CreateUser(User, LoginUser):
 
 class UpdateUser(User):
     email: EmailStr
+    gender: str | None
     profession: str | None
     country: str | None
     city: str | None
