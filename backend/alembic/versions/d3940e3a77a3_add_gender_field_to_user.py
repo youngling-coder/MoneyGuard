@@ -18,7 +18,7 @@ down_revision: Union[str, None] = "f0ddbd49ae3e"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-gender_enum = sa.Enum("MALE", "FEMALE", name="gender")
+gender_enum = sa.Enum("male", "female", name="gender")
 
 
 def upgrade() -> None:

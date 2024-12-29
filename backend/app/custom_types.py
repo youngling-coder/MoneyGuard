@@ -7,5 +7,5 @@ class TransactionType(Enum):
 
 
 class Gender(Enum):
-    MALE = "male"
-    FEMALE = "female"
+    male = "male"
+    female = "female"
