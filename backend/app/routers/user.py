@@ -27,6 +27,7 @@ from ..oauth2 import oauth2
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
+
 @router.get("/verify/{token}", status_code=status.HTTP_204_NO_CONTENT)
 async def verify_email(
     token: Annotated[str, Path()],
@@ -140,9 +141,18 @@ async def update_user(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Something went wrong while image processing",
             )
-    
+
     profile_picture = utils.get_profile_picture_url(current_user.id)
-    updated_user_schema = schemas.UpdateUser(name=name, surname=surname, email=email, birthdate=birthdate, profession=profession, country=country, city=city, profile_picture=profile_picture)
+    updated_user_schema = schemas.UpdateUser(
+        name=name,
+        surname=surname,
+        email=email,
+        birthdate=birthdate,
+        profession=profession,
+        country=country,
+        city=city,
+        profile_picture=profile_picture,
+    )
     updated_user_stmt = (
         update(models.User)
         .where(models.User.id == current_user.id)

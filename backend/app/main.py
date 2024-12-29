@@ -25,11 +25,21 @@ if not os.path.exists(application_settings.profile_pictures_path):
     except FileExistsError:
         pass
     except PermissionError:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error: Permission Denied")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error: Permission Denied",
+        )
     except OSError as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error: Unable to create directory")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error: Unable to create directory",
+        )
 
-app.mount(application_settings.profile_pictures_mount_point, StaticFiles(directory=application_settings.profile_pictures_path), name="static")
+app.mount(
+    application_settings.profile_pictures_mount_point,
+    StaticFiles(directory=application_settings.profile_pictures_path),
+    name="static",
+)
 
 app.include_router(auth.router)
 app.include_router(user.router)

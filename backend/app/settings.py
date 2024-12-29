@@ -30,4 +30,6 @@ class ApplicationSettings(BaseSettings):
 
 
 application_settings = ApplicationSettings()
-application_settings.profile_pictures_path = os.path.expanduser(application_settings.profile_pictures_path)
+application_settings.profile_pictures_path = os.path.expanduser(
+    application_settings.profile_pictures_path
+)
