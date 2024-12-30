@@ -102,20 +102,14 @@ async def create_user(
     "/update", status_code=status.HTTP_200_OK, response_model=schemas.UserBaseResponse
 )
 async def update_user(
-    name: Annotated[str, Form(...)],
-    surname: Annotated[str, Form(...)],
-    email: Annotated[str, Form(...)],
-    gender: Annotated[Gender, Form(...)],
-    birthdate: Annotated[datetime, Form(...)],
-    profession: Annotated[str, Form(...)],
-    country: Annotated[str, Form(...)],
-    city: Annotated[str, Form(...)],
+    user: Annotated[schemas.UpdateUser, Depends(schemas.UpdateUser.as_form)],
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
     profile_picture: Annotated[UploadFile, File(...)] = None,
 ):
 
     SUPPORTED_FILE_TYPES = ("image/png", "image/jpeg")
+
     if profile_picture:
         if profile_picture.content_type not in SUPPORTED_FILE_TYPES:
             raise HTTPException(
@@ -147,26 +141,21 @@ async def update_user(
 
     if not profile_picture:
         profile_picture = current_user.profile_picture
-    updated_user_schema = schemas.UpdateUser(
-        name=name,
-        surname=surname,
-        email=email,
-        gender=gender,
-        birthdate=birthdate,
-        profession=profession,
-        country=country,
-        city=city,
-        profile_picture=profile_picture,
+
+    user_data = user.model_dump(
+        exclude_unset=True, exclude_none=True, exclude_defaults=True
     )
+    user_data["profile_picture"] = profile_picture
+
     updated_user_stmt = (
         update(models.User)
         .where(models.User.id == current_user.id)
-        .values(updated_user_schema.model_dump())
+        .values(user_data)
         .execution_options(synchronize_session="fetch")
         .returning(models.User)
     )
 
-    email_updated = current_user.email != email
+    email_updated = (current_user.email != user.email) and user.email
 
     updated_user_result = await db.execute(updated_user_stmt)
     await db.commit()

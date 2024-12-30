@@ -1,7 +1,11 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
-from .account import AccountBaseResponse
+from typing import List, Annotated
 from datetime import datetime
-from typing import List
+
+from fastapi import Form
+from pydantic import BaseModel, ConfigDict, EmailStr
+
+from ..custom_types import Gender
+from .account import AccountBaseResponse
 
 
 class User(BaseModel):
@@ -19,13 +23,35 @@ class CreateUser(User, LoginUser):
 
 
 class UpdateUser(User):
-    email: EmailStr
+    email: EmailStr | None
     gender: str | None
+    birthdate: datetime | None
     profession: str | None
     country: str | None
     city: str | None
-    birthdate: datetime | None
-    profile_picture: str | None
+
+    @classmethod
+    def as_form(
+        cls,
+        name: Annotated[str, Form()] = None,
+        surname: Annotated[str, Form()] = None,
+        email: Annotated[EmailStr, Form()] = None,
+        gender: Annotated[Gender, Form()] = None,
+        birthdate: Annotated[datetime, Form()] = None,
+        profession: Annotated[str, Form()] = None,
+        country: Annotated[str, Form()] = None,
+        city: Annotated[str, Form()] = None,
+    ) -> "UpdateUser":
+        return cls(
+            name=name,
+            surname=surname,
+            email=email,
+            gender=gender,
+            birthdate=birthdate,
+            profession=profession,
+            country=country,
+            city=city,
+        )
 
 
 class UserBaseResponse(UpdateUser):
