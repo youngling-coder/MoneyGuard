@@ -229,8 +229,19 @@ async def delete_user(
     user = result.scalars().first()
 
     if user.profile_picture:
-        os.remove(user.profile_picture)
 
+        profile_picture_path = utils.get_profile_picture_path(user.id)
+        
+        try:
+            os.remove(profile_picture_path)
+        except Exception as ex:
+            print(ex)
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Couldn't delete profile picture"
+            )
+        
     await db.commit()
 
 
