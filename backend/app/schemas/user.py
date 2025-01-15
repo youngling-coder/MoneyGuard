@@ -25,7 +25,7 @@ class CreateUser(User, LoginUser):
 class UpdateUser(User):
     email: EmailStr | None
     gender: str | None
-    birthdate: datetime | None
+    birthdate: str | None
     profession: str | None
     country: str | None
     city: str | None
@@ -37,7 +37,7 @@ class UpdateUser(User):
         surname: Annotated[str, Form()] = None,
         email: Annotated[EmailStr, Form()] = None,
         gender: Annotated[Gender, Form()] = None,
-        birthdate: Annotated[datetime, Form()] = None,
+        birthdate: Annotated[str, Form()] = None,
         profession: Annotated[str, Form()] = None,
         country: Annotated[str, Form()] = None,
         city: Annotated[str, Form()] = None,
