@@ -7,6 +7,7 @@ from .transaction import TransactionResponse
 
 class Account(BaseModel):
     title: str
+    balance: float
     primary_account_number: str
     card_verification_value: str
     expiration_date: datetime
