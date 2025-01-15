@@ -129,7 +129,10 @@ async def update_user(
         save_path = utils.get_profile_picture_path(current_user.id)
 
         try:
-            image.save(save_path)
+            if image.mode != "RGB":
+                image = image.convert("RGB")
+            
+            image = image.save(save_path)
             profile_picture = utils.get_profile_picture_url(current_user.id)
 
         except Exception as ex:
