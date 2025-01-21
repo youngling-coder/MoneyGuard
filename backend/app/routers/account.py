@@ -70,23 +70,17 @@ async def get_total_balance(
     result = await db.execute(stmt)
     balances = result.scalars().all()
 
-    if not balances:
-
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Account not found!"
-        )
-
     return sum(balances)
 
 
-@router.get("/{id}", response_model=schemas.AccountBaseResponse)
+@router.get("/{primary_account_number}/", response_model=schemas.AccountBaseResponse)
 async def get_account(
-    id: Annotated[int, Path()],
+    primary_account_number: Annotated[str, Path()],
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
-    stmt = select(models.Account).where(models.Account.id == id)
+    stmt = select(models.Account).where(models.Account.primary_account_number == primary_account_number)
     result = await db.execute(stmt)
     account = result.scalars().first()
 
@@ -106,15 +100,15 @@ async def get_account(
     return account
 
 
-@router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete/{primary_account_number}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_account(
-    id: Annotated[int, Path()],
+    primary_account_number: Annotated[str, Path()],
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
     stmt = select(models.Account).filter(
-        models.Account.id == id, models.Account.owner_id == current_user.id
+        models.Account.primary_account_number == primary_account_number, models.Account.owner_id == current_user.id
     )
     result = await db.execute(stmt)
     account_exists = result.scalars().first()
@@ -130,19 +124,19 @@ async def delete_account(
 
 
 @router.put(
-    "/update/{id}",
+    "/update/{primary_account_number}",
     status_code=status.HTTP_200_OK,
     response_model=schemas.AccountBaseResponse,
 )
 async def update_account(
-    id: Annotated[int, Path()],
+    primary_account_number: Annotated[str, Path()],
     account: Annotated[schemas.UpdateAccount, Body()],
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
     stmt = select(models.Account).filter(
-        models.Account.id == id, models.Account.owner_id == current_user.id
+        models.Account.primary_account_number == primary_account_number, models.Account.owner_id == current_user.id
     )
     result = await db.execute(stmt)
     account_exists = result.scalars().first()
