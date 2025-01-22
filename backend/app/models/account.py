@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
+from decimal import Decimal
 
-from sqlalchemy import String, BigInteger, text, Date
+from sqlalchemy import String, Numeric, text, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .mixins import UserRelationMixin
@@ -15,8 +16,8 @@ class Account(UserRelationMixin, Base):
     _user_back_populates = "accounts"
 
     title: Mapped[str] = mapped_column(String, nullable=False)
-    balance: Mapped[int] = mapped_column(
-        BigInteger, nullable=False, server_default=text("0")
+    balance: Mapped[Decimal] = mapped_column(
+        Numeric(precision=15, scale=2, asdecimal=True), nullable=False, server_default=text("0.00")
     )
     primary_account_number: Mapped[str] = mapped_column(
         String, nullable=False, unique=True
