@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy import update, delete
+import copy
 
 from ..database import get_db
 from ..custom_types import Gender
@@ -107,7 +108,6 @@ async def update_user(
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
     profile_picture: Annotated[UploadFile, File(...)] = None,
 ):
-
     SUPPORTED_FILE_TYPES = ("image/png", "image/jpeg")
 
     if profile_picture:
@@ -131,7 +131,7 @@ async def update_user(
         try:
             if image.mode != "RGB":
                 image = image.convert("RGB")
-            
+
             image = image.save(save_path)
             profile_picture = utils.get_profile_picture_url(current_user.id)
 
@@ -157,12 +157,11 @@ async def update_user(
 
         if key == "birthdate":
             if user_data[key]:
-                user_data[key] = datetime.strptime(user_data[key], '%Y-%m-%d')
+                user_data[key] = datetime.strptime(user_data[key], "%Y-%m-%d")
 
             else:
                 user_data[key] = None
 
-                
     updated_user_stmt = (
         update(models.User)
         .where(models.User.id == current_user.id)
@@ -193,6 +192,9 @@ async def update_user(
             to=updated_user.email, subject="Email Confirmation", content=email_template
         )
 
+    updated_user = copy.deepcopy(updated_user)
+    updated_user.birthdate = updated_user.birthdate.strftime("%Y-%m-%d")
+
     return updated_user
 
 
@@ -209,6 +211,13 @@ async def get_user(
     )
     result = await db.execute(stmt)
     requested_user = result.scalars().first()
+
+    if requested_user:
+
+        requested_user = copy.deepcopy(requested_user)
+
+        if requested_user.birthdate:
+            requested_user.birthdate = requested_user.birthdate.strftime("%Y-%m-%d")
 
     return requested_user
 
@@ -231,7 +240,7 @@ async def delete_user(
     if user.profile_picture:
 
         profile_picture_path = utils.get_profile_picture_path(user.id)
-        
+
         try:
             os.remove(profile_picture_path)
         except Exception as ex:
@@ -239,9 +248,9 @@ async def delete_user(
 
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Couldn't delete profile picture"
+                detail="Couldn't delete profile picture",
             )
-        
+
     await db.commit()
 
 
