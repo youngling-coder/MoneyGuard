@@ -17,7 +17,9 @@ class Account(UserRelationMixin, Base):
 
     title: Mapped[str] = mapped_column(String, nullable=False)
     balance: Mapped[Decimal] = mapped_column(
-        Numeric(precision=15, scale=2, asdecimal=True), nullable=False, server_default=text("0.00")
+        Numeric(precision=15, scale=2, asdecimal=True),
+        nullable=False,
+        server_default=text("0.00"),
     )
     primary_account_number: Mapped[str] = mapped_column(
         String, nullable=False, unique=True

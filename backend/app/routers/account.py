@@ -80,7 +80,9 @@ async def get_account(
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
-    stmt = select(models.Account).where(models.Account.primary_account_number == primary_account_number)
+    stmt = select(models.Account).where(
+        models.Account.primary_account_number == primary_account_number
+    )
     result = await db.execute(stmt)
     account = result.scalars().first()
 
@@ -100,7 +102,9 @@ async def get_account(
     return account
 
 
-@router.delete("/delete/{primary_account_number}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/delete/{primary_account_number}", status_code=status.HTTP_204_NO_CONTENT
+)
 async def delete_account(
     primary_account_number: Annotated[str, Path()],
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -108,7 +112,8 @@ async def delete_account(
 ):
 
     stmt = select(models.Account).filter(
-        models.Account.primary_account_number == primary_account_number, models.Account.owner_id == current_user.id
+        models.Account.primary_account_number == primary_account_number,
+        models.Account.owner_id == current_user.id,
     )
     result = await db.execute(stmt)
     account_exists = result.scalars().first()
@@ -136,7 +141,8 @@ async def update_account(
 ):
 
     stmt = select(models.Account).filter(
-        models.Account.primary_account_number == primary_account_number, models.Account.owner_id == current_user.id
+        models.Account.primary_account_number == primary_account_number,
+        models.Account.owner_id == current_user.id,
     )
     result = await db.execute(stmt)
     account_exists = result.scalars().first()

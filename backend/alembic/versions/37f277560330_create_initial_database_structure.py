@@ -44,7 +44,10 @@ def upgrade() -> None:
         "accounts",
         sa.Column("title", sa.String(), nullable=False),
         sa.Column(
-            "balance", sa.Numeric(precision=15, scale=2, asdecimal=True), server_default=sa.text("0.00"), nullable=False
+            "balance",
+            sa.Numeric(precision=15, scale=2, asdecimal=True),
+            server_default=sa.text("0.00"),
+            nullable=False,
         ),
         sa.Column("primary_account_number", sa.String(), nullable=False),
         sa.Column("owner_id", sa.Integer(), nullable=False),
@@ -61,7 +64,10 @@ def upgrade() -> None:
     op.create_table(
         "transactions",
         sa.Column(
-            "amount", sa.Numeric(precision=15, scale=2, asdecimal=True), server_default=sa.text("0.00"), nullable=False
+            "amount",
+            sa.Numeric(precision=15, scale=2, asdecimal=True),
+            server_default=sa.text("0.00"),
+            nullable=False,
         ),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column("sender_recipient", sa.String(), nullable=True),
