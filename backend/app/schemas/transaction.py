@@ -6,7 +6,7 @@ from ..custom_types import TransactionType
 class Transaction(BaseModel):
     amount: float
     description: str | None
-    recipient: str | None
+    sender_recipient: str | None
 
 
 class CreateTransaction(Transaction):
