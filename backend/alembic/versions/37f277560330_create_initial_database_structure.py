@@ -61,7 +61,7 @@ def upgrade() -> None:
     op.create_table(
         "transactions",
         sa.Column(
-            "amount", sa.DECIMAL(precision=2), server_default=sa.text("0"), nullable=False
+            "amount", sa.DECIMAL(precision=2, scale=15), server_default=sa.text("0"), nullable=False
         ),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column("sender_recipient", sa.String(), nullable=True),
