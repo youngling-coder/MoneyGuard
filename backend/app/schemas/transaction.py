@@ -6,12 +6,11 @@ from ..custom_types import TransactionType
 class Transaction(BaseModel):
     amount: float
     description: str | None
-    type: TransactionType
     recipient: str | None
 
 
 class CreateTransaction(Transaction):
-    pass
+    type: TransactionType
 
 
 class TransactionResponse(CreateTransaction):
