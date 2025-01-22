@@ -63,7 +63,7 @@ def upgrade() -> None:
     op.create_table(
         "transactions",
         sa.Column(
-            "amount", sa.BigInteger(), server_default=sa.text("0"), nullable=False
+            "amount", sa.DECIMAL(precision=2), server_default=sa.text("0"), nullable=False
         ),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column("type", transaction_type, nullable=False),
