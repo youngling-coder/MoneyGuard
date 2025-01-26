@@ -13,7 +13,8 @@ class Transaction(AccountRelationMixin, Base):
         Numeric(precision=15, scale=2), nullable=False, server_default=text("0.00")
     )
     category: Mapped[str] = mapped_column(String, nullable=False)
-    sender_recipient: Mapped[str] = mapped_column(String)
+    sender_recipient: Mapped[str] = mapped_column(String, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=False)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__} (id={self.id}, type="{self.type}", amount="{self.amount}", recipient="{self.recipient}")'
