@@ -123,7 +123,7 @@ async def delete_account(
             status_code=status.HTTP_404_NOT_FOUND, detail="Account not found!"
         )
 
-    stmt = delete(models.Account).where(models.Account.id == id)
+    stmt = delete(models.Account).where(models.Account.primary_account_number == primary_account_number)
     await db.execute(stmt)
     await db.commit()
 
@@ -154,7 +154,7 @@ async def update_account(
 
     stmt = (
         update(models.Account)
-        .where(models.Account.id == id)
+        .where(models.Account.primary_account_number == primary_account_number)
         .values(account.model_dump())
         .execution_options(synchronize_session="fetch")
         .returning(models.Account)
