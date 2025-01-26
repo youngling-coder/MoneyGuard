@@ -1,12 +1,12 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from ..custom_types import TransactionType
+from ..custom_types import TransactionType, TransactionCategory
 
 
 class Transaction(BaseModel):
     amount: float
-    description: str | None
-    sender_recipient: str | None
+    category: TransactionCategory
+    sender_recipient: str
 
 
 class CreateTransaction(Transaction):
