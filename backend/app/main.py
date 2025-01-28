@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 
-from .routers import auth, user, account, security_code_session
+from .routers import auth, user, account, security_code_session, transaction
 from .settings import application_settings
 
 app = FastAPI()
@@ -44,4 +44,5 @@ app.mount(
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(account.router)
+app.include_router(transaction.router)
 app.include_router(security_code_session.router)
