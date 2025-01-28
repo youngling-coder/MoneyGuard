@@ -17,8 +17,9 @@ class TransactionCategory(Enum):
     health_wellness = "Health & Wellness"
     entertainment_leisure = "Entertainment & Leisure"
     debt_loans = "Debt & Loans"
+    other = "Other"
 
 
 class Gender(Enum):
-    male = "DFDSFSDF sdfsdf"
-    female = "female sdfsdf"
+    male = "male"
+    female = "female"
