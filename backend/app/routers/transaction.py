@@ -76,3 +76,39 @@ async def get_all_transactions(
     transactions = result.scalars().all()
 
     return transactions
+
+
+@router.get("/get/{primary_account_number}", response_model=list[schemas.TransactionResponse])
+async def get_transactions_from_account(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+    primary_account_number: Annotated[str, Path()],
+    limit: Annotated[int, Query()] = 10,
+    offset: Annotated[int, Query()] = 0,
+):
+    
+    stmt = (
+        select(models.Account)
+        .outerjoin(models.Account.transactions)
+        .filter(models.Account.primary_account_number == primary_account_number)
+        .options(
+            contains_eager(models.Account.transactions)
+        )
+        .order_by(models.Transaction.timestamp.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+
+    result = await db.execute(stmt)
+    account = result.scalars().first()
+
+    if not account:
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Account not found!"
+        )
+    
+    transactions = account.transactions
+
+    return transactions
