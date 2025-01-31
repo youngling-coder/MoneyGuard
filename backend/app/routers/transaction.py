@@ -1,14 +1,17 @@
+from datetime import datetime
 from typing import Annotated
+from decimal import Decimal
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload, contains_eager
 from sqlalchemy import delete, update
+from sqlalchemy.future import select
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status, Path
 
 from .. import models, schemas
 from ..database import get_db
 from ..oauth2 import oauth2
-from ..custom_types import TransactionCategory
+from ..custom_types import TransactionCategory, TransactionType
 
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
@@ -52,3 +55,24 @@ async def create_transaction(transaction: Annotated[schemas.CreateTransaction, B
 
     db.add(new_transaction)
     await db.commit()
+
+
+@router.get("/get_all", response_model=list[schemas.TransactionResponse])
+async def get_all_transactions(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+    limit: Annotated[int, Query()] = 10,
+    offset: Annotated[int, Query()] = 0,
+):
+
+    stmt = (
+        select(models.Transaction)
+        .where(models.Transaction.user_id == current_user.id)
+        .offset(offset)
+        .limit(limit)
+    ).order_by(models.Transaction.timestamp.desc())
+
+    result = await db.execute(stmt)
+    transactions = result.scalars().all()
+
+    return transactions
