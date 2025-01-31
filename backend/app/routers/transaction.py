@@ -18,3 +18,37 @@ router = APIRouter(prefix="/transactions", tags=["Transactions"])
 async def get_categories():
 
     return [category.value for category in TransactionCategory]
+
+
+@router.post("/create")
+async def create_transaction(transaction: Annotated[schemas.CreateTransaction, Body()],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)]
+):
+    stmt = select(models.Account).filter(models.Account.primary_account_number == transaction.primary_account_number)
+    result = await db.execute(stmt)
+    account = result.scalars().first()
+
+    if not account:
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Account not found!"
+        )
+    
+    if transaction.type.value == TransactionType.expense.value:
+        transaction.amount = -transaction.amount
+
+    account.balance += Decimal(str(transaction.amount))
+    
+    transaction_dict = transaction.model_dump()
+    transaction_dict.pop("type")
+    transaction_dict.pop("primary_account_number")
+    
+    new_transaction = models.Transaction(**transaction_dict)
+    new_transaction.category = transaction.category.value
+    new_transaction.owner_id = account.id
+    new_transaction.user_id = current_user.id
+
+    db.add(new_transaction)
+    await db.commit()
