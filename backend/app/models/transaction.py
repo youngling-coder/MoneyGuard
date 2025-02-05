@@ -14,4 +14,6 @@ class Transaction(AccountRelationMixin, Base):
     )
     category: Mapped[str] = mapped_column(String, nullable=False)
     sender_recipient: Mapped[str] = mapped_column(String, nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=False
+    )
