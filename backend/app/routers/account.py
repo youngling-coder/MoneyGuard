@@ -20,7 +20,8 @@ async def add_account(
 ):
 
     stmt = select(models.Account).filter(
-        models.Account.primary_account_number == account.primary_account_number
+        models.Account.primary_account_number == account.primary_account_number,
+        models.Account.owner_id == current_user.id
     )
     result = await db.execute(stmt)
     account_exists = result.scalars().first()
@@ -81,7 +82,8 @@ async def get_account(
 ):
 
     stmt = select(models.Account).where(
-        models.Account.primary_account_number == primary_account_number
+        models.Account.primary_account_number == primary_account_number,
+        models.Account.owner_id == current_user.id
     )
     result = await db.execute(stmt)
     account = result.scalars().first()
