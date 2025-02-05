@@ -7,7 +7,7 @@ DATABASE_URL = f"postgresql+asyncpg://{application_settings.db_user}:{applicatio
 
 # TODO: SET ECHO VALUE TO FALSE BEFORE PRODUCTION!!!
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL, echo=False)
 
 async_session = sessionmaker(
     bind=engine,
