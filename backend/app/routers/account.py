@@ -8,6 +8,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query, status, Path
 from .. import models, schemas
 from ..database import get_db
 from ..oauth2 import oauth2
+from ..custom_types import TransactionCategory
 
 router = APIRouter(prefix="/accounts", tags=["Accounts"])
 
@@ -35,8 +36,29 @@ async def add_account(
     new_account = models.Account(**account.model_dump())
     new_account.owner_id = current_user.id
 
-    db.add(new_account)
-    await db.commit()
+    try:
+        db.add(new_account)
+        await db.commit()
+        await db.refresh(new_account)
+
+        if new_account.balance:
+            first_transaction = models.Transaction(
+                amount=new_account.balance,
+                sender_recipient=f"{current_user.name} {current_user.surname}",
+                owner_id=new_account.id,
+                category=TransactionCategory.income.value,
+                user_id=current_user.id,
+            )
+            db.add(first_transaction)
+
+        await db.commit()
+
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {str(e)}",
+        )
 
 
 @router.get("/get_all", response_model=list[schemas.AccountBaseResponse])
