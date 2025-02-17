@@ -37,3 +37,15 @@ async def login(
     access_token = oauth2.create_token(data={"id": user.id})
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(
+    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    token: str = Depends(oauth2.oauth2_scheme),
+):
+
+    expired_token = models.ExpiredToken(token=token)
+    db.add(expired_token)
+    await db.commit()
