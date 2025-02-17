@@ -12,7 +12,7 @@ def get_change_ratio(compared: Decimal, reference: Decimal) -> Decimal:
         change_ratio = (compared - reference) / reference * change_ratio
 
         return change_ratio
-    
+
     else:
         return change_ratio
 
@@ -60,8 +60,14 @@ def get_balance_change_ratio(
     for transaction in previous_month_transactions:
         previous_month_balance -= transaction.amount
 
-
-    change_ratio = round(float(get_change_ratio(compared=selected_month_balance, reference=previous_month_balance)), ndigits=precision)
+    change_ratio = round(
+        float(
+            get_change_ratio(
+                compared=selected_month_balance, reference=previous_month_balance
+            )
+        ),
+        ndigits=precision,
+    )
 
     if (selected_month_balance < previous_month_balance and change_ratio > 0) or (
         selected_month_balance > previous_month_balance and change_ratio < 0
@@ -113,6 +119,9 @@ def get_transactions_change_ratio(
     current_amount = sum(map(lambda t: t.amount, selected_month_transactions))
     previous_amount = sum(map(lambda t: t.amount, previous_month_transactions))
 
-    change_ratio = round(float(get_change_ratio(compared=previous_amount, reference=previous_amount)), ndigits=precision)
+    change_ratio = round(
+        float(get_change_ratio(compared=previous_amount, reference=previous_amount)),
+        ndigits=precision,
+    )
 
     return current_amount, change_ratio

@@ -71,8 +71,7 @@ async def get_current_user(
 
     if token:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token provided!"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token provided!"
         )
 
     stmt = select(models.User).filter(models.User.id == token_data.id)

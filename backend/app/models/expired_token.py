@@ -4,5 +4,5 @@ from sqlalchemy import String
 
 
 class ExpiredToken(Base):
-    
+
     token: Mapped[str] = mapped_column(String, unique=True)

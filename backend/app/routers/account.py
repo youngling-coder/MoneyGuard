@@ -26,7 +26,7 @@ async def add_account(
 
     stmt = select(models.Account).filter(
         models.Account.primary_account_number == account.primary_account_number,
-        models.Account.owner_id == current_user.id
+        models.Account.owner_id == current_user.id,
     )
     result = await db.execute(stmt)
     account_exists = result.scalars().first()

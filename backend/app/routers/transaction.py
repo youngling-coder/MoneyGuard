@@ -32,7 +32,7 @@ async def create_transaction(
 ):
     stmt = select(models.Account).filter(
         models.Account.primary_account_number == transaction.primary_account_number,
-        models.Account.owner_id == current_user.id
+        models.Account.owner_id == current_user.id,
     )
     result = await db.execute(stmt)
     account = result.scalars().first()
@@ -96,8 +96,10 @@ async def get_transactions_from_account(
     stmt = (
         select(models.Account)
         .outerjoin(models.Account.transactions)
-        .filter(models.Account.primary_account_number == primary_account_number,
-                models.Account.owner_id == current_user.id)
+        .filter(
+            models.Account.primary_account_number == primary_account_number,
+            models.Account.owner_id == current_user.id,
+        )
         .options(contains_eager(models.Account.transactions))
         .order_by(models.Transaction.timestamp.desc())
         .limit(limit)
@@ -132,8 +134,10 @@ async def get_expenses(
 
     stmt = (
         select(models.Account)
-        .filter(models.Account.primary_account_number == primary_account_number,
-                models.Account.owner_id == current_user.id)
+        .filter(
+            models.Account.primary_account_number == primary_account_number,
+            models.Account.owner_id == current_user.id,
+        )
         .options(selectinload(models.Account.transactions))
     )
     result = await db.execute(stmt)
@@ -149,7 +153,9 @@ async def get_expenses(
     transactions = list(filter(lambda t: t.amount < 0, transactions))
 
     if month:
-        amount, change_ratio = get_transactions_change_ratio(month=month, transactions=transactions)
+        amount, change_ratio = get_transactions_change_ratio(
+            month=month, transactions=transactions
+        )
 
     else:
         amount = 0
@@ -172,8 +178,10 @@ async def get_income(
 
     stmt = (
         select(models.Account)
-        .filter(models.Account.primary_account_number == primary_account_number,
-                models.Account.owner_id == current_user.id)
+        .filter(
+            models.Account.primary_account_number == primary_account_number,
+            models.Account.owner_id == current_user.id,
+        )
         .options(selectinload(models.Account.transactions))
     )
     result = await db.execute(stmt)
@@ -189,7 +197,9 @@ async def get_income(
     transactions = list(filter(lambda t: t.amount >= 0, transactions))
 
     if month:
-        amount, change_ratio = get_transactions_change_ratio(month=month, transactions=transactions)
+        amount, change_ratio = get_transactions_change_ratio(
+            month=month, transactions=transactions
+        )
 
     else:
         amount = 0
@@ -249,8 +259,7 @@ async def get_diagram(
         if diagram[category] == 0:
             diagram.pop(category)
             continue
-                
-        diagram[category] = round(diagram[category] * 100 / transactions_amount, 2)
 
+        diagram[category] = round(diagram[category] * 100 / transactions_amount, 2)
 
     return diagram

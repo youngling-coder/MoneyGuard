@@ -150,18 +150,6 @@ async def update_user(
     )
     user_data["profile_picture"] = profile_picture
 
-    for key in user_data.keys():
-
-        if user_data[key] == "null":
-            user_data[key] = ""
-
-        if key == "birthdate":
-            if user_data[key]:
-                user_data[key] = datetime.strptime(user_data[key], "%Y-%m-%d")
-
-            else:
-                user_data[key] = None
-
     updated_user_stmt = (
         update(models.User)
         .where(models.User.id == current_user.id)
@@ -193,7 +181,7 @@ async def update_user(
         )
 
     updated_user = copy.deepcopy(updated_user)
-    updated_user.birthdate = updated_user.birthdate.strftime("%Y-%m-%d")
+    updated_user.birthdate = updated_user.birthdate
 
     return updated_user
 
@@ -215,9 +203,6 @@ async def get_user(
     if requested_user:
 
         requested_user = copy.deepcopy(requested_user)
-
-        if requested_user.birthdate:
-            requested_user.birthdate = requested_user.birthdate.strftime("%Y-%m-%d")
 
     return requested_user
 

@@ -5,7 +5,7 @@ __all__ = (
     "get_profile_picture_path",
     "get_profile_picture_url",
     "get_transactions_change_ratio",
-    "get_balance_change_ratio"
+    "get_balance_change_ratio",
 )
 
 from .hash import get_hash
