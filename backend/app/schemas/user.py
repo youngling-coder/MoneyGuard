@@ -23,12 +23,12 @@ class CreateUser(User, LoginUser):
 
 
 class UpdateUser(User):
-    email: EmailStr | None
-    gender: str | None
-    birthdate: str | None
-    profession: str | None
+    email: EmailStr
+    gender: str | None = None
+    birthdate: datetime | None = None
+    profession: str | None = None
     country: str | None
-    city: str | None
+    city: str | None = None
 
     @classmethod
     def as_form(
@@ -36,11 +36,11 @@ class UpdateUser(User):
         name: Annotated[str, Form()] = None,
         surname: Annotated[str, Form()] = None,
         email: Annotated[EmailStr, Form()] = None,
-        gender: Annotated[Gender, Form()] = None,
-        birthdate: Annotated[str, Form()] = None,
-        profession: Annotated[str, Form()] = None,
-        country: Annotated[str, Form()] = None,
-        city: Annotated[str, Form()] = None,
+        gender: Annotated[Gender | None, Form()] = None,
+        birthdate: Annotated[datetime | None, Form()] = None,
+        profession: Annotated[str | None, Form()] = None,
+        country: Annotated[str | None, Form()] = None,
+        city: Annotated[str | None, Form()] = None,
     ) -> "UpdateUser":
         return cls(
             name=name,
