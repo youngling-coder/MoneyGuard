@@ -1,11 +1,15 @@
+from datetime import datetime
 from typing import Annotated
+from decimal import Decimal
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy import delete, update
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status, Path
 
 from .. import models, schemas
+from ..utils import get_balance_change_ratio
 from ..database import get_db
 from ..oauth2 import oauth2
 from ..custom_types import TransactionCategory
@@ -85,15 +89,36 @@ async def get_accounts(
 async def get_total_balance(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+    month: Annotated[int, Query()] = None,
 ):
 
-    stmt = select(models.Account.balance).filter(
-        models.Account.owner_id == current_user.id
-    )
-    result = await db.execute(stmt)
-    balances = result.scalars().all()
+    change_ratio = Decimal("100.0")
 
-    return sum(balances)
+    stmt = (
+        select(models.Account)
+        .filter(models.Account.owner_id == current_user.id)
+        .options(selectinload(models.Account.transactions))
+    )
+
+    result = await db.execute(stmt)
+    accounts = result.scalars().all()
+
+    total_balance = Decimal("0.0")
+
+    for account in accounts:
+        total_balance += account.balance
+
+    if month:
+        transactions: list[models.Transaction] = []
+
+        for account in accounts:
+            transactions.extend(account.transactions)
+
+        total_balance, change_ratio = get_balance_change_ratio(
+            total_balance=total_balance, month=month, transactions=transactions
+        )
+
+    return {"amount": total_balance, "change_ratio": change_ratio}
 
 
 @router.get("/{primary_account_number}/", response_model=schemas.AccountBaseResponse)
@@ -105,7 +130,7 @@ async def get_account(
 
     stmt = select(models.Account).where(
         models.Account.primary_account_number == primary_account_number,
-        models.Account.owner_id == current_user.id
+        models.Account.owner_id == current_user.id,
     )
     result = await db.execute(stmt)
     account = result.scalars().first()
@@ -147,7 +172,9 @@ async def delete_account(
             status_code=status.HTTP_404_NOT_FOUND, detail="Account not found!"
         )
 
-    stmt = delete(models.Account).where(models.Account.primary_account_number == primary_account_number)
+    stmt = delete(models.Account).where(
+        models.Account.primary_account_number == primary_account_number
+    )
     await db.execute(stmt)
     await db.commit()
 
