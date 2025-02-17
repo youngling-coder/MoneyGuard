@@ -65,6 +65,16 @@ async def get_current_user(
         token=token, credentials_exception=credentials_exception
     )
 
+    stmt = select(models.ExpiredToken).filter(models.ExpiredToken.token == token)
+    result = await db.execute(stmt)
+    token = result.scalars().first()
+
+    if token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token provided!"
+        )
+
     stmt = select(models.User).filter(models.User.id == token_data.id)
     result = await db.execute(stmt)
     user = result.scalars().first()
