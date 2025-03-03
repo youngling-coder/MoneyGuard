@@ -27,6 +27,12 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Seems there's no user with a given email! Double check spelling!",
         )
+    
+    if not user.email_confirmed:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please verify your email before continue!"
+        )
 
     if not utils.verify_hash(user_credentials.password, user.password):
         raise HTTPException(
