@@ -11,7 +11,7 @@ To get started, please follow these simple steps:
 
 1. Log in to your account.  
 2. Confirm your email by clicking the link below:  
-    http://localhost:8000email_confirmation_url
+    email_confirmation_url
 3. Begin using MoneyGuard to manage and safeguard your finances!  
 
 {SIGNATURE}
@@ -21,7 +21,7 @@ To get started, please follow these simple steps:
 We have updated your email address as requested.
 
 To complete this process, please confirm your new email by clicking the link below:
-    http://localhost:8000email_confirmation_url
+    email_confirmation_url
 
 If you did not request this update, please follow these steps to secure your account:  
 
