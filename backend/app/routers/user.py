@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated
 from io import BytesIO
 import os
@@ -8,7 +7,6 @@ from fastapi import (
     APIRouter,
     Body,
     Depends,
-    Form,
     HTTPException,
     status,
     File,
@@ -21,8 +19,8 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import update, delete
 import copy
 
+from ..settings import application_settings
 from ..database import get_db
-from ..custom_types import Gender
 from .. import models, schemas, utils, smtp, verification
 from ..oauth2 import oauth2
 
@@ -30,30 +28,25 @@ from ..oauth2 import oauth2
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.get("/verify/{token}", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/verify/{token}", status_code=status.HTTP_204_NO_CONTENT)
 async def verify_email(
     token: Annotated[str, Path()],
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
+    # current_user: Annotated[models.User, Depends(oauth2.get_current_user)],
 ):
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="User is not authenticated to confirm an email",
+        detail="Unable to verify email!",
     )
+    
     email_to_verify = verification.verify_confirmation_token(
         token=token, credentials_exception=credentials_exception
     )
 
-    if email_to_verify != current_user.email:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Current user email and confirmation email don't match!",
-        )
-
     stmt = (
         update(models.User)
-        .where(models.User.id == current_user.id)
+        .where(models.User.email == email_to_verify)
         .execution_options(synchronize_session="fetch")
         .values(email_confirmed=True)
     )
@@ -86,8 +79,29 @@ async def create_user(
     db.add(new_user)
     await db.commit()
 
-    verification_token = verification.generate_confirmation_token(email=new_user.email)
-    email_confirmation_url = f"{router.prefix}/verify/{verification_token}"
+
+@router.post("/send_verification_email")
+async def send_verification_email(verify_user: Annotated[schemas.VerifyUser, Body()],
+                                  db: Annotated[AsyncSession, Depends(get_db)]):
+
+    stmt = select(models.User).filter(models.User.email == verify_user.email)
+    result = await db.execute(stmt)
+    user = result.scalars().first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found!",
+        )
+    
+    if user.email_confirmed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already confirmed!",
+        )
+    
+    verification_token = verification.generate_confirmation_token(email=verify_user.email)
+    email_confirmation_url = f"{application_settings.frontend_domain}/verify.html/#{verification_token}"
     email_template = smtp.EmailTemplates.SIGNUP_EMAIL_VERIFICATION_TEMPLATE
 
     email_template = email_template.replace(
@@ -95,9 +109,9 @@ async def create_user(
     )
 
     await smtp.send_email(
-        to=new_user.email, subject="Email Confirmation", content=email_template
+        to=verify_user.email, subject="Email Confirmation", content=email_template
     )
-
+    
 
 @router.put(
     "/update", status_code=status.HTTP_200_OK, response_model=schemas.UserBaseResponse
