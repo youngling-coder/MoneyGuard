@@ -68,3 +68,7 @@ class UserAccountsResponse(UserBaseResponse):
 class ResetPassword(BaseModel):
     security_code_session_token: str
     new_password: str
+
+
+class VerifyUser(BaseModel):
+    email: EmailStr

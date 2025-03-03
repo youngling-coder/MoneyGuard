@@ -18,10 +18,12 @@ __all__ = (
     "CreateSecurityCodeSession",
     "RequestSecurityCodeSession",
     "VerifySecurityCodeSession",
+    "VerifyUser"
 )
 
 from .user import CreateUser
 from .user import UpdateUser
+from .user import VerifyUser
 from .user import LoginUser
 from .user import UserBaseResponse
 from .user import UserAccountsResponse
