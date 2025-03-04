@@ -26,6 +26,7 @@ class ApplicationSettings(BaseSettings):
     email_confirmation_url_expiration_time: int
 
     frontend_domain: str
+    hostname: str
 
     class Config:
         env_file = ".env"
