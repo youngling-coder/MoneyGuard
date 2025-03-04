@@ -20,9 +20,9 @@ def get_profile_picture_path(id: int) -> str:
 
 
 def get_profile_picture_url(
-    id: int, host: str = "https://cool-kite-divine.ngrok-free.app"
+    id: int
 ) -> str:
 
-    profile_picture_url = f"{host}{application_settings.profile_pictures_mount_point}/{__profile_picture_filename(id=id)}"
+    profile_picture_url = f"{application_settings.hostname}{application_settings.profile_pictures_mount_point}/{__profile_picture_filename(id=id)}"
 
     return profile_picture_url
