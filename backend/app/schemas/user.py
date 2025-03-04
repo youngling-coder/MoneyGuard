@@ -22,8 +22,10 @@ class CreateUser(User, LoginUser):
     pass
 
 
-class UpdateUser(User):
-    email: EmailStr
+class UpdateUser(BaseModel):
+    name: str | None = None
+    surname: str | None = None
+    email: EmailStr | None = None
     gender: str | None = None
     birthdate: datetime | None = None
     profession: str | None = None
@@ -33,9 +35,9 @@ class UpdateUser(User):
     @classmethod
     def as_form(
         cls,
-        name: Annotated[str, Form()] = None,
-        surname: Annotated[str, Form()] = None,
-        email: Annotated[EmailStr, Form()] = None,
+        name: Annotated[str | None, Form()] = None,
+        surname: Annotated[str | None, Form()] = None,
+        email: Annotated[EmailStr | None, Form()] = None,
         gender: Annotated[Gender | None, Form()] = None,
         birthdate: Annotated[datetime | None, Form()] = None,
         profession: Annotated[str | None, Form()] = None,
