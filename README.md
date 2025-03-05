@@ -25,12 +25,6 @@ This project is intended to demonstrate the professional skills of the authors. 
 - Monitor cash flow
 - Generate financial reports and charts
 
-## Installation & Setup
-### Prerequisites
-- Docker installed
-- PostgreSQL database
-- Node.js and npm installed
-
 ## Authors
 [@KristinaPotapenko](https://github.com/KristinaPotapenko) - Backend, Devops
 
