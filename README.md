@@ -1,4 +1,4 @@
-# Banking Account Management Application
+# MoneyGuard
 
 ## Overview
 This project is a banking account management application designed to handle account creation, transactions, fund flow tracking, and financial reporting. The application provides functionalities for creating and modifying bank accounts and transactions, as well as visualizing financial data through reports and charts.
