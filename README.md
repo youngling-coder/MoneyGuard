@@ -26,9 +26,9 @@ This project is intended to demonstrate the professional skills of the authors. 
 - Generate financial reports and charts
 
 ## Authors
-[@KristinaPotapenko](https://github.com/KristinaPotapenko) - Backend, Devops
+[@KristinaPotapenko](https://github.com/KristinaPotapenko) -  Frontend, Design
 
-[@youngling-coder](https://github.com/youngling-coder) - Frontend, Design
+[@youngling-coder](https://github.com/youngling-coder) - Backend, Devops
 
 ## Disclaimer
 This application is **not intended for real banking transactions** and should only be used for learning and demonstration purposes.
