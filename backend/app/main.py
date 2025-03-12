@@ -9,7 +9,7 @@ from .settings import application_settings
 
 app = FastAPI()
 
-origins = ["*"]
+origins = ["https://kristinapotapenko.github.io"]
 
 app.add_middleware(
     CORSMiddleware,
