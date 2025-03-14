@@ -164,6 +164,11 @@ async def update_user(
     )
     user_data["profile_picture"] = profile_picture
 
+    email_updated = current_user.email != user.email
+
+    if email_updated:
+        user_data["email_confirmed"] = False
+    
     updated_user_stmt = (
         update(models.User)
         .where(models.User.id == current_user.id)
@@ -171,8 +176,6 @@ async def update_user(
         .execution_options(synchronize_session="fetch")
         .returning(models.User)
     )
-
-    email_updated = (current_user.email != user.email) and user.email
 
     updated_user_result = await db.execute(updated_user_stmt)
     await db.commit()
@@ -183,7 +186,7 @@ async def update_user(
         verification_token = verification.generate_confirmation_token(
             email=updated_user.email
         )
-        email_confirmation_url = f"{router.prefix}/verify/{verification_token}"
+        email_confirmation_url = f"{application_settings.frontend_domain}/Money-Guard/verify.html/#{verification_token}"
         email_template = smtp.EmailTemplates.EMAIL_VERIFICATION_TEMPLATE
 
         email_template = email_template.replace(
