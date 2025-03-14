@@ -101,7 +101,7 @@ async def send_verification_email(verify_user: Annotated[schemas.VerifyUser, Bod
         )
     
     verification_token = verification.generate_confirmation_token(email=verify_user.email)
-    email_confirmation_url = f"{application_settings.frontend_domain}/verify.html/#{verification_token}"
+    email_confirmation_url = f"{application_settings.frontend_domain}/Money-Guard/verify.html/#{verification_token}"
     email_template = smtp.EmailTemplates.SIGNUP_EMAIL_VERIFICATION_TEMPLATE
 
     email_template = email_template.replace(
